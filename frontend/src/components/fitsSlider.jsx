@@ -1,68 +1,68 @@
 "use client";
 
-import React, { useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel";
 
 export default function FitsSlider({ items = [], onSlideChange }) {
-  const [index, setIndex] = useState(0);
-  const touchStartX = useRef(null);
+  const [api, setApi] = useState(null);
 
-  const total = items.length || 1;
+  useEffect(() => {
+    if (!api) return;
 
-  const goTo = (newIndex) => {
-    const safeIndex = ((newIndex % total) + total) % total; // wrap around
-    setIndex(safeIndex);
-    if (onSlideChange) onSlideChange(safeIndex);
-  };
+    // initial
+    const initialIndex = api.selectedScrollSnap();
+    if (onSlideChange) onSlideChange(initialIndex);
 
-  const handleTouchStart = (e) => {
-    touchStartX.current = e.touches[0].clientX;
-  };
+    // on change
+    const onSelect = () => {
+      const index = api.selectedScrollSnap();
+      if (onSlideChange) onSlideChange(index);
+    };
 
-  const handleTouchEnd = (e) => {
-    if (touchStartX.current == null) return;
-    const deltaX = e.changedTouches[0].clientX - touchStartX.current;
+    api.on("select", onSelect);
 
-    if (Math.abs(deltaX) > 40) {
-      if (deltaX > 0) {
-        goTo(index - 1); // swipe right -> previous
-      } else {
-        goTo(index + 1); // swipe left -> next
-      }
-    }
+    return () => {
+      api.off("select", onSelect);
+    };
+  }, [api, onSlideChange]);
 
-    touchStartX.current = null;
-  };
-
-  const currentItem = items[index] ?? {};
-  const imageSrc = currentItem.image || currentItem.avatar || "/fits/guy.jpg";
+  const slides = items.length > 0 ? items : [{}];
 
   return (
-    <div
-      className="w-full relative rounded-3xl border-[3px] border-[#1A3D2F] overflow-hidden bg-[#E7EEE3]"
-      onTouchStart={handleTouchStart}
-      onTouchEnd={handleTouchEnd}
-    >
-      {/* Outfit image */}
-      <div className="aspect-[3/4] w-full">
-        <img
-          src={imageSrc}
-          alt={currentItem.name || "Outfit"}
-          className="w-full h-full object-fits"
-        />
-      </div>
+    <Carousel setApi={setApi} className="w-full">
+      <CarouselContent>
+        {slides.map((item, i) => {
+          const imageSrc = item.image || item.avatar || "/fits/guy.jpg";
 
-      {/* Dots indicator */}
-      <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-1.5">
-        {items.map((_, i) => (
-          <button
-            key={i}
-            onClick={() => goTo(i)}
-            className={`h-1.5 rounded-full transition-all ${
-              i === index ? "w-4 bg-white" : "w-1.5 bg-white/60"
-            }`}
-          />
-        ))}
-      </div>
-    </div>
+          return (
+            <CarouselItem key={item.id ?? i}>
+              <div className="relative border-[4px] border-[#1A3D2F] rounded-3xl overflow-hidden bg-[#f5ebd5] shadow-sm">
+                <div className="aspect-[3/4] w-full">
+                  <img
+                    src={imageSrc}
+                    alt={item.name || "Outfit"}
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+              </div>
+            </CarouselItem>
+          );
+        })}
+      </CarouselContent>
+
+      {/* Prev / Next buttons */}
+      <CarouselPrevious className="left-2 bg-white/90 text-[#1A3D2F] border border-[#AFC7B6]/70 shadow-sm hover:bg-white">
+        ‹
+      </CarouselPrevious>
+      <CarouselNext className="right-2 bg-white/90 text-[#1A3D2F] border border-[#AFC7B6]/70 shadow-sm hover:bg-white">
+        ›
+      </CarouselNext>
+    </Carousel>
   );
 }
