@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useCallback, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Card, CardContent } from "@/components/ui/card";
@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Slider } from "@/components/ui/slider";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import FitsSlider from "@/components/fitsSlider";
 import BottomNav from "@/components/ui/BottomNav";
 
 export default function HomePage() {
@@ -26,6 +27,8 @@ export default function HomePage() {
               <AvatarFallback className="text-lg">👤</AvatarFallback>
             </Avatar>
           </Link>
+{/* ==== IMAGE CARD ==== */}
+          <FitsSlider />
 
           <div className="flex flex-col leading-tight">
             <span className="text-sm font-semibold">You</span>
