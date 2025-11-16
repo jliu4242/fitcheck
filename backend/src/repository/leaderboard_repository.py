@@ -2,13 +2,13 @@ from datetime import datetime
 from sqlalchemy.orm import Session
 from ..models.average_ratings import AverageRating
 import uuid
-from friend_repository import FriendRepository
+from ..repository.friend_repository import FriendRepository
 from typing import Dict
 
 class LeaderboardRepository:
 
     def get_leaderboard(self, db: Session, id: uuid.UUID) -> Dict[uuid.UUID, AverageRating]:
-        current_date = datetime.now
+        current_date = datetime.now()
         leaderboard = []
 
         friends = FriendRepository().find_all_friends(db=db, user_id=id)
