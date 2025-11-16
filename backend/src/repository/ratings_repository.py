@@ -1,11 +1,12 @@
 from sqlalchemy.orm import Session
 from ..models.ratings import Rating
 from typing import Optional
+from uuid import UUID
 
 class RatingsRepository:
     
     def find_by_id(self, db: Session, user_id) -> Optional[bool]:
-        return db.query(Rating).filter(Rating.user_id == user_id).first()
+        return db.query(Rating).filter(Rating.rater_id == user_id).first()
     
     def find_all_by_post_id(self, db: Session, post_id) -> list[Rating]:
         return db.query(Rating).filter(Rating.post_id == post_id).all()
@@ -14,3 +15,9 @@ class RatingsRepository:
         db.add(rating)
         db.commit()
         db.refresh(rating)
+
+    def exists(self, db: Session, post_id: UUID, rater_id: UUID) -> bool:
+        rating = db.query(Rating).filter(
+            (Rating.post_id == post_id) & (Rating.rater_id == rater_id)
+        ).first()
+        return rating is not None
