@@ -25,15 +25,3 @@ def login(data: LoginRequest, db: Session = Depends(get_db)):
         return service.login(db, data)
     except ValueError as e:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=str(e))
-    
-@router.get("/users/{user_id}", response_model=UsernameResponse)
-def get_user_by_id(
-    user_id: str,
-    db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user)
-):
-    user = service.repo.find_by_id(db, user_id)
-    if not user:
-        raise HTTPException(status_code=404, detail="User not found")
-    
-    return UsernameResponse(username=user.username)
