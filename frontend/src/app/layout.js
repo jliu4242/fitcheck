@@ -3,7 +3,7 @@ import ServiceWorkerRegister from "@/components/ServiceWorkerRegister";
 import { AuthProvider } from '@/context/authContext';
 
 export const metadata = {
-  title: "Outfy",
+  title: "FitCheck",
   description: "Rate the fit with your friends"
 };
 
