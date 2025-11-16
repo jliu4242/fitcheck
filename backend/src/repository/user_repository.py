@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Session
-from src.models.users import User
+from ..models.users import User
 from typing import Optional
 
 class UserRepository:
