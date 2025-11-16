@@ -19,7 +19,7 @@ async def create_rating (
                     current_user: User = Depends(get_current_user),
                 ):
     try:
-        return service.create_rating(db, ratingData.rater_id, ratingData.post_id, ratingData.rating_value)
+        return service.create_rating(db, current_user.user_id, ratingData.post_id, ratingData.rating_value)
     except Exception as e:
         print(f"Full error: {type(e).__name__}")
         print(f"Error details: {str(e)}")
