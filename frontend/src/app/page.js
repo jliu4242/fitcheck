@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -20,10 +21,13 @@ export default function HomePage() {
         <div className="w-full h-full rounded-[26px] border-[2px] border-black p-4 flex flex-col gap-3">
           {/* ==== TOP: user info ==== */}
           <header className="flex items-center gap-3">
-            <Avatar className="h-10 w-10 border border-black">
-              <AvatarImage src="/avatar.png" alt="You" />
-              <AvatarFallback className="text-lg">👤</AvatarFallback>
-            </Avatar>
+            <Link href="/auth">
+                <Avatar className="h-10 w-10 border border-black">
+                    <AvatarImage src="/avatar.png" alt="You" />
+                <AvatarFallback className="text-lg">👤</AvatarFallback>
+                </Avatar>
+            </Link>
+            
             <div className="flex flex-col leading-tight">
               <span className="text-sm font-semibold">You</span>
               <span className="text-xs text-muted-foreground">3hrs ago</span>
