@@ -3,6 +3,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import Image from "next/image";
 import { Carousel, CarouselContent, CarouselItem } from '@/components/ui/carousel';
 
+import CommentBar from "@/components/ui/commentBar";
+
 const initialFits = [
     {
         id: 1,
@@ -25,19 +27,20 @@ const initialFits = [
 export default function fitsSlider() {
     const [fits, setFits] = useState(initialFits);
 
-    console.log("FitsCarousel fits:", fits);
-
     const renderEvent = (fit) => {
         return (
-            <Card className="mt-1 flex-1 rounded-3xl overflow-hidden border-0 bg-slate-50 shadow-sm">
-                <CardContent className="p-0 h-[55dvh]">
-                    <div className="relative w-full h-full">
+            <Card className="">
+                <CardContent className="p-0 flex flex-col space-y-4">
+                    <div className="relative w-full h-[55dvh] overflow-hidden rounded-3xl">
                         <Image
                             src={fit.image}
                             alt={fit.alt}
                             fill
-                            className="object-cover"
+                            className="object-cover p-1.5"
                         />
+                    </div>
+                    <div className='pl-5 pr-5'>
+                        <CommentBar/>
                     </div>
                 </CardContent>
             </Card>
