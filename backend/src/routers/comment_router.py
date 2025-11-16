@@ -3,28 +3,37 @@ from sqlalchemy.orm import Session
 from ..repository.comment_repository import *
 from ..db import get_db
 from ..dto.comment_schemas import PostComment, UpdateComment
+from ..dependencies import get_current_user
+
 
 router = APIRouter(prefix="/comment", tags=["comment"])
 
+# Gets the full comment from the comment id
 @router.get("/get_by_id/{comment_id}", status_code=status.HTTP_200_OK)
-def get_by_id(comment_id:str, db: Session = Depends(get_db)):
+def get_by_id(comment_id:str, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+
     comment_id = validate_uuid(comment_id)
     return CommentRepository().get_by_id(db=db, id=comment_id)
 
+# Gets the full comment from the post id
 @router.get("/get_by_post_id/{post_id}", status_code=status.HTTP_200_OK)
-def get_by_post_id(post_id:str, db: Session = Depends(get_db)):
+def get_by_post_id(post_id:str, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+
     post_id = validate_uuid(post_id)
     return CommentRepository().get_by_post_id(db=db, pid=post_id)
 
+# Gets the comment content (string) from comment id
 @router.get("/get_content/{comment_id}", status_code=status.HTTP_200_OK)
-def get_content(comment_id:str, db: Session = Depends(get_db)):
+def get_content(comment_id:str, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+
     comment_id = validate_uuid(comment_id)
     return CommentRepository().get_comment_content(db=db, id=comment_id)
 
+# Gets the parents comment id - can input into get_by_id to get the full parent object
 @router.get("/get_parent/{comment_id}", status_code=status.HTTP_200_OK)
-def get_parent(comment_id:str, db: Session = Depends(get_db)):
+def get_parent(comment_id:str, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+
     comment_id = validate_uuid(comment_id)
-    
     parent_id = CommentRepository().get_parent_comment_id(db=db, id=comment_id)
 
     try:
@@ -35,22 +44,27 @@ def get_parent(comment_id:str, db: Session = Depends(get_db)):
 
     return parent_id
 
-
+# Gets the time the comment was created at
 @router.get("/get_created_at/{comment_id}", status_code=status.HTTP_200_OK)
-def get_created_at(comment_id:str, db: Session = Depends(get_db)):
+def get_created_at(comment_id:str, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+    
     comment_id = validate_uuid(comment_id)
     return CommentRepository().get_created_at(db=db, id=comment_id)
 
+# Updates the comment content: edit comment
 @router.put("/update_comment_content/",status_code=status.HTTP_200_OK)
-def update_comment_content(comment: UpdateComment, db: Session = Depends(get_db)):
+def update_comment_content(comment: UpdateComment, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+
     if comment.new_content == None:
         raise HTTPException(status_code=400, detail="Content cant be null")
+    
     comment_id = validate_uuid(comment.comment_id)
     return CommentRepository().update_comment_content(db=db, id=comment_id, content=comment.new_content)
 
-
+# Creats a new comment
 @router.post("/post_comment/",status_code=status.HTTP_200_OK)
-def post_comment(comment:PostComment, db: Session = Depends(get_db)):
+def post_comment(comment:PostComment, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+
     parent_id = None
     if comment.parent_id != "":
         try:
@@ -70,14 +84,13 @@ def post_comment(comment:PostComment, db: Session = Depends(get_db)):
                                     parent_id=parent_id)
     return {"data":comment}
 
+# Deletes comment via comment id
 @router.delete("/delete_comment/{comment_id}",status_code=status.HTTP_200_OK)
-def delete_comment(comment_id:str, db: Session = Depends(get_db)):
+def delete_comment(comment_id:str, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
     comment_id = validate_uuid(comment_id)
     return CommentRepository().delete_comment(db=db, id=comment_id)
 
-
-
-
+# Helper function
 def validate_uuid(to_validate:str):
     try:
         return uuid.UUID(to_validate)
