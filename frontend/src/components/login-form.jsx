@@ -1,3 +1,4 @@
+import { useState } from 'react'; // Add this import
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import {
@@ -14,12 +15,33 @@ import {
   FieldLabel,
 } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
+import { useAuth } from '@/context/authContext';
 
 export function LoginForm({
   className,
-  switchToSignup, // <-- ADD THIS
+  switchToSignup,
   ...props
 }) {
+  const { login } = useAuth();
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+
+  const handleLogin = async (e) => {
+    e.preventDefault(); // Prevent form refresh
+    setLoading(true);
+    setError('');
+
+    try {
+      await login(email, password);
+    } catch (err) {
+      setError('Invalid email or password');
+    } finally {
+      setLoading(false);
+    }
+  };
+    
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
       <Card>
@@ -31,7 +53,7 @@ export function LoginForm({
         </CardHeader>
 
         <CardContent>
-          <form>
+          <form onSubmit={handleLogin}>
             <FieldGroup>
               <Field>
                 <FieldLabel htmlFor="email">Email</FieldLabel>
@@ -39,6 +61,8 @@ export function LoginForm({
                   id="email"
                   type="email"
                   placeholder="m@example.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                   required
                 />
               </Field>
@@ -53,12 +77,22 @@ export function LoginForm({
                     Forgot your password?
                   </button>
                 </div>
-                <Input id="password" type="password" required />
+                <Input 
+                  id="password" 
+                  type="password" 
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required 
+                />
               </Field>
 
+              {error && (
+                <p className="text-red-500 text-sm">{error}</p>
+              )}
+
               <Field>
-                <Button type="submit" className="w-full">
-                  Login
+                <Button type="submit" className="w-full" disabled={loading}>
+                  {loading ? 'Logging in...' : 'Login'}
                 </Button>
 
                 <Button variant="outline" type="button" className="w-full mt-2">
@@ -70,7 +104,7 @@ export function LoginForm({
                   <button
                     type="button"
                     className="text-primary underline-offset-4 hover:underline"
-                    onClick={switchToSignup}   // <-- FIXED
+                    onClick={switchToSignup}
                   >
                     Sign up
                   </button>

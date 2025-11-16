@@ -11,13 +11,6 @@ router = APIRouter(prefix="/ratings", tags=["ratings"])
 service = RatingsService()
 
 # ---------------------------  helpers --------------------------
-def findavg(ratings) -> float:
-    ratingSum = 0
-    for rating in ratings:
-        ratingSum += rating.rating_value
-    
-    avg = ratingSum // len(ratings)
-    return avg
 
 @router.post("/create-rating", response_model=RatingResponse, status_code=status.HTTP_201_CREATED)
 async def create_rating (
@@ -26,7 +19,7 @@ async def create_rating (
                     current_user: User = Depends(get_current_user),
                 ):
     try:
-        return await service.create_rating(db, ratingData.rater_id, ratingData.post_id, ratingData.rating_value)
+        return service.create_rating(db, ratingData.rater_id, ratingData.post_id, ratingData.rating_value)
     except Exception as e:
         print(f"Full error: {type(e).__name__}")
         print(f"Error details: {str(e)}")
@@ -40,7 +33,7 @@ def get_ratings_avg(
                 current_user: User = Depends(get_current_user),
                 ):
         try:
-            avg = findavg(service.get_all_ratings(db, post_id))
+            avg = service.findavg(service.get_all_ratings(db, post_id))
             return avg
         except Exception as e:
             print(f"Full error: {type(e).__name__}")

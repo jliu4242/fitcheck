@@ -18,6 +18,7 @@ async def create_post(
                     current_user: User = Depends(get_current_user)
                     ):
     try:
+        print("endpoint reached")
         return await service.create_post(db, current_user.user_id, caption, image)
     except ValueError as e:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
@@ -54,4 +55,14 @@ def delete_post(
         return service.delete_post(db, current_user.user_id, post_id)
     except ValueError as e:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
+    
+@router.post("/get-recent", response_model=list[PostResponse], status_code=status.HTTP_200_OK)
+def get_all_recent_posts(
+                        db: Session = Depends(get_db),
+                        current_user: User = Depends(get_current_user),
+                        ):
+    try:
+        return service.get_all_recent_posts(db, current_user.user_id)
+    except ValueError as e:
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
     

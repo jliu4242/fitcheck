@@ -1,4 +1,6 @@
 from ..repository.post_repository import PostRepository
+from ..repository.average_rating_repository import AverageRatingRepository
+from ..repository.friend_repository import FriendRepository
 from sqlalchemy.orm import Session
 from ..models.users import User
 from ..service.jwt_service import JwtService
@@ -7,6 +9,7 @@ from ..dto.post_schemas import PostResponse
 from fastapi import UploadFile, HTTPException, status
 from uuid import UUID, uuid4
 from ..models.posts import Post
+from ..models.average_ratings import AverageRating
 
 jwt_service = JwtService()
 image_service = ImageService()
@@ -15,6 +18,8 @@ class PostService:
 
     def __init__(self):
         self.repo = PostRepository()
+        self.average_rating_repo = AverageRatingRepository()
+        self.friend_repo = FriendRepository()
 
     async def create_post(self, db: Session, user_id: UUID, caption: str, image: UploadFile) -> PostResponse:
         
@@ -48,6 +53,14 @@ class PostService:
         )
         self.repo.create_post(db, post)
 
+        avg = AverageRating(
+            user_id=user_id,
+            post_id=post.post_id,
+            created_at=post.created_at,
+            average_rating=0
+        )
+        self.average_rating_repo.create(db, avg)
+
         return post
     
     def get_post(self, db: Session, post_id: str) -> PostResponse:
@@ -71,6 +84,10 @@ class PostService:
             raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_CONTENT, detail=str(e))
         
         posts = self.repo.find_all_by_user_id(db, user_uuid)
+        return posts
+    
+    def get_all_recent_posts(self, db: Session, user_id: UUID) -> list[PostResponse]:
+        posts = self.repo.find_recent_by_user_id(db, user_id, self.friend_repo)
         return posts
     
     def delete_post(self, db: Session, user_id: UUID, post_id: str):

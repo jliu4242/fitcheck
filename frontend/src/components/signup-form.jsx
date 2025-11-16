@@ -1,3 +1,4 @@
+import { useState } from 'react'; // Add this import
 import { Button } from "@/components/ui/button"
 import {
   Card,
@@ -13,11 +14,46 @@ import {
   FieldLabel,
 } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
+import { useAuth } from '@/context/authContext';
 
 export function SignupForm({
-  switchToLogin, // <-- add this
+  switchToLogin,
   ...props
 }) {
+  const { register } = useAuth();
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+
+  const handleSignup = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setError('');
+
+    if (password !== confirmPassword) {
+      setError('Passwords do not match');
+      setLoading(false);
+      return;
+    }
+
+    if (password.length < 8) {
+      setError('Password must be at least 8 characters long');
+      setLoading(false);
+      return;
+    }
+
+    try {
+      await register(email, password, name);
+    } catch (err) {
+      setError(err.message || 'Failed to create account');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <Card {...props}>
       <CardHeader>
@@ -28,11 +64,18 @@ export function SignupForm({
       </CardHeader>
 
       <CardContent>
-        <form>
+        <form onSubmit={handleSignup}>
           <FieldGroup>
             <Field>
               <FieldLabel htmlFor="name">Full Name</FieldLabel>
-              <Input id="name" type="text" placeholder="John Doe" required />
+              <Input 
+                id="name" 
+                type="text" 
+                placeholder="John Doe" 
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                required 
+              />
             </Field>
 
             <Field>
@@ -41,6 +84,8 @@ export function SignupForm({
                 id="email"
                 type="email"
                 placeholder="m@example.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 required
               />
               <FieldDescription>
@@ -51,7 +96,13 @@ export function SignupForm({
 
             <Field>
               <FieldLabel htmlFor="password">Password</FieldLabel>
-              <Input id="password" type="password" required />
+              <Input 
+                id="password" 
+                type="password" 
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required 
+              />
               <FieldDescription>
                 Must be at least 8 characters long.
               </FieldDescription>
@@ -61,15 +112,25 @@ export function SignupForm({
               <FieldLabel htmlFor="confirm-password">
                 Confirm Password
               </FieldLabel>
-              <Input id="confirm-password" type="password" required />
+              <Input 
+                id="confirm-password" 
+                type="password" 
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                required 
+              />
               <FieldDescription>
                 Please confirm your password.
               </FieldDescription>
             </Field>
 
+            {error && (
+              <p className="text-red-500 text-sm">{error}</p>
+            )}
+
             <Field>
-              <Button type="submit" className="w-full">
-                Create Account
+              <Button type="submit" className="w-full" disabled={loading}>
+                {loading ? 'Creating Account...' : 'Create Account'}
               </Button>
 
               <Button

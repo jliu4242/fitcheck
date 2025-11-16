@@ -3,6 +3,8 @@ from sqlalchemy.orm import Session
 from ..db import get_db
 from ..dto.auth_schemas import SignupRequest, SignUpResponse, LoginRequest, LoginResponse
 from ..service.auth_service import AuthService
+from ..models.users import User
+from ..dependencies import get_current_user
 
 router = APIRouter(prefix="/api/auth", tags=["auth"])
 service = AuthService()
@@ -22,3 +24,17 @@ def login(data: LoginRequest, db: Session = Depends(get_db)):
         return service.login(db, data)
     except ValueError as e:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=str(e))
+    
+@router.get("/users/{user_id}")
+def get_user_by_id(
+    user_id: str,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    user = service.repo.find_by_id(db, user_id)
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    return {
+        "username": user.username
+    }

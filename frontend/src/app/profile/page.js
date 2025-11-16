@@ -4,6 +4,7 @@ import React from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import BottomNav from "@/components/ui/BottomNav";
+import { useAuth } from "@/context/authContext";
 
 import {
   Card,
@@ -38,6 +39,7 @@ const MOCK_POSTS = [
 
 export default function UserPage() {
   const router = useRouter();
+  const { user, token } = useAuth();   
 
   return (
     <div className="min-h-screen flex flex-col bg-[#f0ddbb] text-[#1A3D2F]">

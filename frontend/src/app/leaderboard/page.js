@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react"
 import BottomNav from "@/components/ui/BottomNav";
 
 import {
@@ -14,55 +14,89 @@ import {
   Avatar,
   AvatarImage,
   AvatarFallback,
-} from "@/components/ui/avatar";
+} from "@/components/ui/avatar"
+import { useAuth } from "@/context/authContext";
 
-const leaderboardData = [
-  {
-    id: 1,
-    name: "You",
-    username: "@you",
-    avgRating: 4.9,
-    totalRatings: 87,
-  },
-  {
-    id: 2,
-    name: "Emily Chen",
-    username: "@emchen",
-    avgRating: 4.7,
-    totalRatings: 63,
-  },
-  {
-    id: 3,
-    name: "Rizky",
-    username: "@riz",
-    avgRating: 4.6,
-    totalRatings: 51,
-  },
-  {
-    id: 4,
-    name: "Daniel Park",
-    username: "@dpark",
-    avgRating: 4.5,
-    totalRatings: 39,
-  },
-  {
-    id: 5,
-    name: "Sarah Lee",
-    username: "@sarah",
-    avgRating: 4.4,
-    totalRatings: 28,
-  },
-];
-
-// Rank-based colors (Option C aesthetic)
 const rankColors = {
   1: "#D4AF37", // Gold
   2: "#C0C0C0", // Silver
   3: "#CD7F32", // Bronze
   default: "#B4C8B1", // Soft Green for others
 };
+// const leaderboardData = [
+//   {
+//     id: 1,
+//     name: "You",
+//     username: "@you",
+//     avgRating: 4.9,
+//     totalRatings: 87,
+//   },
+//   {
+//     id: 2,
+//     name: "Emily Chen",
+//     username: "@emchen",
+//     avgRating: 4.7,
+//     totalRatings: 63,
+//   },
+//   {
+//     id: 3,
+//     name: "Rizky",
+//     username: "@riz",
+//     avgRating: 4.6,
+//     totalRatings: 51,
+//   },
+//   {
+//     id: 4,
+//     name: "Daniel Park",
+//     username: "@dpark",
+//     avgRating: 4.5,
+//     totalRatings: 39,
+//   },
+//   {
+//     id: 5,
+//     name: "Sarah Lee",
+//     username: "@sarah",
+//     avgRating: 4.4,
+//     totalRatings: 28,
+//   },
+// ]
 
 export default function LeaderboardPage() {
+    const { user, token } = useAuth();
+    const [data, setData] = useState([]);
+
+    function createData(users) {
+        const data = data.map((item, index) => ({
+            i: index + 1,
+            name: item.user_id,
+            avgRating: item.avg_rating,
+        }))
+    }
+
+    useEffect(() => {
+        async function fetchData() {
+            const res = await fetch("http://localhost:8000/leaderboard/", {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                },
+            })
+            var data = await res.json();
+            console.log("Raw data:", data); // ← Check what this logs
+            console.log("Is array?", Array.isArray(data)); // ← Check if it's an array
+            if (data.length > 5) {
+                data = data.slice(0,5);
+            }
+            setData(data && data.map((item, index) => ({
+                i: index + 1,
+                name: item.user_id,
+                avgRating: item.average_rating,
+            })))
+        }
+        
+        fetchData();
+    }, [token]);
+
   return (
     <div className="flex min-h-screen flex-col bg-[#f0ddbb] text-[#1A3D2F]">
 
@@ -88,24 +122,21 @@ export default function LeaderboardPage() {
           </CardHeader>
 
           <CardContent className="space-y-3">
-            {leaderboardData.map((user, index) => {
-              const rank = index + 1;
-              const bgColor = rankColors[rank] || rankColors.default;
-
-              return (
-                <div
-                  key={user.id}
-                  className="flex items-center justify-between rounded-xl px-4 py-3 shadow-sm border"
-                  style={{
+            {data.map((user, index) => (
+              <div
+                key={user.id}
+                className="flex items-center justify-between rounded-xl bg-muted/60 px-4 py-3"
+                style={{
                     backgroundColor: bgColor,
                     borderColor: "rgba(0,0,0,0.08)",
                   }}
                 >
-                  {/* Left: rank + avatar + name */}
-                  <div className="flex items-center gap-3">
-                    <span className="w-6 text-center text-sm font-semibold text-[#1A3D2F]">
-                      #{rank}
-                    </span>
+              >
+                {/* Left: rank + avatar + name */}
+                <div className="flex items-center gap-3">
+                  <span className="w-6 text-center text-sm font-semibold">
+                    #{index + 1}
+                  </span>
 
                     <Avatar className="h-9 w-9 border border-white/40">
                       <AvatarImage src="" alt={user.name} />
