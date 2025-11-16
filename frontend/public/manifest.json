@@ -1,6 +1,6 @@
 {
-  "name": "Outfit Check",
-  "short_name": "OutfitCheck",
+  "name": "Outfy",
+  "short_name": "Outfy",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#f3f3f3",
