@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useCallback, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Card, CardContent } from "@/components/ui/card";
@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Slider } from "@/components/ui/slider";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import FitsSlider from "@/components/fitsSlider";
 import BottomNav from "@/components/ui/BottomNav";
 
 export default function HomePage() {
@@ -35,18 +36,7 @@ export default function HomePage() {
           </header>
 
           {/* ==== IMAGE CARD ==== */}
-          <Card className="mt-1 flex-1 rounded-3xl overflow-hidden border-0 bg-slate-50 shadow-sm">
-            <CardContent className="p-0 h-full">
-              <div className="relative w-full h-[380px]">
-                <Image
-                  src="/guy.jpg"
-                  alt="Outfit"
-                  fill
-                  className="object-cover"
-                />
-              </div>
-            </CardContent>
-          </Card>
+          <FitsSlider />
 
           {/* ==== SLIDER ==== */}
           <div className="flex flex-col items-center gap-1">
