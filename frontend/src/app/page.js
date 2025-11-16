@@ -39,7 +39,7 @@ export default function HomePage() {
             <CardContent className="p-0 h-full">
               <div className="relative w-full h-[380px]">
                 <Image
-                  src="/public/outfit sample.jpg"
+                  src="/guy.jpg"
                   alt="Outfit"
                   fill
                   className="object-cover"

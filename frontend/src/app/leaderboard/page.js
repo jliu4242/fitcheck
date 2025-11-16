@@ -128,9 +128,7 @@ export default function LeaderboardPage() {
       </main>
 
       {/* Bottom navigation (reusable) */}
-      <div className="fixed inset-x-0 bottom-0 px-4 pb-4">
-        {/* If your BottomNav accepts props like "active", you can pass it: */}
-        {/* <BottomNav active="leaderboard" /> */}
+      <div className="fixed inset-x-0 bottom-0 px-4 pb-[calc(env(safe-area-inset-bottom)+16px)]">
         <BottomNav />
       </div>
     </div>
