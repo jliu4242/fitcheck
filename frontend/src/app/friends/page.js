@@ -19,6 +19,7 @@ const ALL_USERS = [
 export default function FriendsPage() {
   const [search, setSearch] = useState("");
   const [friends, setFriends] = useState([]);
+  const [nonFriends, setNonFriends] = useState([]);
   const [activeTab, setActiveTab] = useState("find"); // "find" | "list"
   const [loading, setLoading] = useState(true);
   const { user, token } = useAuth();
