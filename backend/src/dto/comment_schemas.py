@@ -7,3 +7,7 @@ class PostComment(BaseModel):
     post_id:str
     content:str
     parent_id:str
+
+class UpdateComment(BaseModel):
+    comment_id:str
+    new_content:str
