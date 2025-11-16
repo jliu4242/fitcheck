@@ -76,7 +76,7 @@ export default function FriendsPage() {
                     key={user.id}
                     className="bg-slate-100 rounded-2xl border-0 shadow-none"
                   >
-                    <CardContent className="py-3 px-3 flex items-center justify-between gap-3">
+                    <CardContent className="py-2 px-3 flex items-center justify-between gap-3">
                       <div className="flex items-center gap-3">
                         <Avatar className="h-9 w-9 bg-slate-700">
                           <AvatarFallback className="text-white text-sm">
@@ -119,7 +119,7 @@ export default function FriendsPage() {
               </h2>
 
               {friends.length === 0 && (
-                <p className="text-xs text-slate-500">
+                <p className="text-xs text-slate-500 text-center py-2">
                   You haven&apos;t added any friends yet.
                 </p>
               )}
@@ -130,7 +130,7 @@ export default function FriendsPage() {
                     key={user.id}
                     className="bg-slate-100 rounded-2xl border-0 shadow-none"
                   >
-                    <CardContent className="py-3 px-3 flex items-center gap-3">
+                    <CardContent className="py-2 px-3 flex items-center gap-3">
                       <Avatar className="h-9 w-9 bg-slate-700">
                         <AvatarFallback className="text-white text-sm">
                           {user.name[0]}
