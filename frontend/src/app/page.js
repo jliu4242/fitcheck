@@ -6,8 +6,7 @@ import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import FitsSlider from "@/components/fitsSlider";
 import BottomNav from "@/components/ui/BottomNav";
 import { Slider } from "@/components/ui/slider";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
+import { CommentBar } from "@/components/commentBar";
 
 const FITS = [
   {
@@ -39,36 +38,22 @@ const FITS = [
 export default function HomePage() {
   const [rating, setRating] = useState([40]);
   const [currentIndex, setCurrentIndex] = useState(0);
-
-  const [commentInput, setCommentInput] = useState("");
   const [comments, setComments] = useState([]);
 
   const currentFit = FITS[currentIndex] ?? FITS[0];
 
-  const handleSendComment = () => {
-    const trimmed = commentInput.trim();
-    if (!trimmed) return;
-
-    const newComment = { id: Date.now(), text: trimmed };
+  const handleSendComment = (text) => {
+    const newComment = { id: Date.now(), text };
     setComments((prev) => [...prev, newComment]);
-    setCommentInput("");
 
     setTimeout(() => {
       setComments((prev) => prev.filter((c) => c.id !== newComment.id));
     }, 3000);
   };
 
-  const handleKeyDown = (e) => {
-    if (e.key === "Enter") {
-      e.preventDefault();
-      handleSendComment();
-    }
-  };
-
   return (
     <main className="min-h-screen bg-[#f0ddbb] text-[#1A3D2F] flex flex-col">
       <div className="flex-1 flex flex-col gap-4 px-4 pt-10 pb-24 max-w-md w-full mx-auto">
-
         {/* TITLE */}
         <h1 className="text-2xl font-semibold tracking-tight text-center text-[#1A3D2F]">
           Rate Your Friend&apos;s Outfit
@@ -135,23 +120,8 @@ export default function HomePage() {
           </p>
         </div>
 
-        {/* COMMENT INPUT */}
-        <div className="px-5 pt-2 flex items-center gap-2">
-          <Input
-            placeholder="Send a comment..."
-            value={commentInput}
-            onChange={(e) => setCommentInput(e.target.value)}
-            onKeyDown={handleKeyDown}
-            className="text-sm bg-white border border-[#C9D7CC] text-[#1A3D2F] placeholder:text-[#9AAD9C]"
-          />
-          <Button
-            size="sm"
-            className="text-xs px-4 bg-[#1A3D2F] hover:bg-[#153126] text-[#F4F7F2] rounded-full"
-            onClick={handleSendComment}
-          >
-            Send
-          </Button>
-        </div>
+        {/* COMMENT BAR */}
+        <CommentBar onSend={handleSendComment} />
       </div>
 
       {/* BOTTOM NAV */}
