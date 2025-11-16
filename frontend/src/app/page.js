@@ -3,10 +3,10 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import FitsSlider from "@/components/fitsSlider";
+import FitsCarousel from "@/components/fitsCarousel";   // ⬅️ new
 import BottomNav from "@/components/ui/BottomNav";
 import { Slider } from "@/components/ui/slider";
-import { CommentBar } from "@/components/commentBar";
+import CommentBar from "@/components/ui/commentBar";
 
 const FITS = [
   {
@@ -94,8 +94,8 @@ export default function HomePage() {
             </div>
           )}
 
-          {/* Fits carousel */}
-          <FitsSlider items={FITS} onSlideChange={setCurrentIndex} />
+          {/* shadcn carousel version */}
+          <FitsCarousel items={FITS} onSlideChange={setCurrentIndex} />
         </div>
 
         {/* RATING SLIDER */}

@@ -28,7 +28,7 @@ export default function CommentBar({ onSend }) {
   };
 
   return (
-    <div className="flex items-center gap-2 rounded-full border-2 border-black px-3 py-1">
+    <div className="flex items-center gap-2 rounded-full border-2 bg-[white] border-black px-3 py-1">
       <Input
         className="border-0 shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 text-xs"
         placeholder="Comment Here ..."

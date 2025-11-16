@@ -40,7 +40,7 @@ export default function UserPage() {
   const router = useRouter();
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#E7EEE3] text-[#1A3D2F]">
+    <div className="min-h-screen flex flex-col bg-[#f0ddbb] text-[#1A3D2F]">
 
       {/* Main content */}
       <main className="flex-1 flex flex-col gap-4 px-4 pt-12 pb-24 max-w-md mx-auto w-full">

@@ -37,7 +37,7 @@ export default function FriendsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#E7EEE3] flex flex-col text-[#1A3D2F]">
+    <div className="min-h-screen bg-[#f0ddbb] flex flex-col text-[#1A3D2F]">
       <main className="flex-1 w-full max-w-md mx-auto px-4 pt-11 pb-32">
         {/* Page title + subtitle */}
         <header className="mb-4 text-center">
@@ -111,7 +111,7 @@ export default function FriendsPage() {
                         <CardContent className="py-2 px-3 flex items-center justify-between gap-3">
                           <div className="flex items-center gap-3">
                             <Avatar className="h-9 w-9 bg-[#1A3D2F]">
-                              <AvatarFallback className="text-white text-sm">
+                              <AvatarFallback className="text-white text-sm bg-[#1A3D2F]">
                                 {user.name[0]}
                               </AvatarFallback>
                             </Avatar>
@@ -166,7 +166,7 @@ export default function FriendsPage() {
                   >
                     <CardContent className="py-2 px-3 flex items-center gap-3">
                       <Avatar className="h-9 w-9 bg-[#1A3D2F]">
-                        <AvatarFallback className="text-white text-sm">
+                        <AvatarFallback className="text-white text-sm bg-[#1A3D2F]">
                           {user.name[0]}
                         </AvatarFallback>
                       </Avatar>
