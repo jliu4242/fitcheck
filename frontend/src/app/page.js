@@ -1,9 +1,10 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useCallback, useState } from "react";
 import Link from "next/link";
 import { MessageCircle } from "lucide-react";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import FitsSlider from "@/components/fitsSlider";
 import FitsCarousel from "@/components/fitsCarousel";
 import BottomNav from "@/components/ui/BottomNav";
 import { Slider } from "@/components/ui/slider";
@@ -17,6 +18,7 @@ const FITS = [
     avatar: "/emily.jpg",
     image: "/fits/basicgirl.jpg",
     timeAgo: "5 min ago",
+    caption: "Cozy coffee shop vibes ☕✨",
   },
   {
     id: 2,
@@ -25,6 +27,7 @@ const FITS = [
     avatar: "/rizky.png",
     image: "/fits/guy.jpg",
     timeAgo: "30 min ago",
+    caption: "Trying something new today, thoughts?",
   },
   {
     id: 3,
@@ -33,6 +36,8 @@ const FITS = [
     avatar: "/daniel.png",
     image: "/fits/man.jpg",
     timeAgo: "1 hr ago",
+    // no caption on purpose – should hide the caption section
+    caption: "",
   },
 ];
 
@@ -51,7 +56,6 @@ export default function HomePage() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isCommentsOpen, setIsCommentsOpen] = useState(false);
   const [commentsByFit, setCommentsByFit] = useState(INITIAL_COMMENTS);
-  var a = 0;
 
   const currentFit = FITS[currentIndex] ?? FITS[0];
   const currentComments = commentsByFit[currentFit.id] ?? [];
@@ -81,15 +85,14 @@ export default function HomePage() {
 
   return (
     <main className="min-h-screen bg-[#f0ddbb] text-[#1A3D2F] flex flex-col">
-      <div className="flex-1 flex flex-col gap-4 px-4 pt-15 pb-24 max-w-md w-full mx-auto">
+      <div className="flex-1 flex flex-col gap-4 px-4 pt-9 pb-24 max-w-md w-full mx-auto">
         {/* TITLE */}
         <h1 className="text-[30px] font-semibold tracking-tight text-center text-[#1A3D2F]">
           Rate Your Friend&apos;s Outfit
         </h1>
 
-<<<<<<< HEAD
         {/* CAROUSEL + OVERLAYS */}
-        <div className="relative mt-0 h-[490px]">
+        <div className="relative h-[480px]">
           {/* User info bubble (top-left) */}
           <header className="absolute top-8 left-3 z-20 flex items-center gap-2 bg-white/85 text-[#1A3D2F] px-3 py-1 rounded-full backdrop-blur-md shadow-sm border border-[#AFC7B6]/60">
             <Link href="/profile">
@@ -113,36 +116,41 @@ export default function HomePage() {
           <button
             type="button"
             onClick={() => setIsCommentsOpen(true)}
-            className="absolute bottom-8 left-3 z-20 flex items-center justify-center h-10 w-10 rounded-2xl border-2 border-black bg-white shadow-sm active:scale-95 transition-transform"
+            className="absolute bottom-6 left-3 z-20 flex items-center justify-center h-10 w-10 rounded-2xl border-2 border-black bg-white shadow-sm active:scale-95 transition-transform"
           >
             <MessageCircle className="h-4 w-4 text-black" />
           </button>
 
           {/* Carousel stretched vertically */}
-          <div className="absolute inset-0 pt-5 pb-2">
+          <div className="absolute inset-0 pt-4 pb-0">
             <FitsCarousel items={FITS} onSlideChange={handleSlideChange} />
-=======
-          <div className="flex flex-col leading-tight">
-            <span className="text-sm font-semibold">You</span>
-            <span className="text-xs text-muted-foreground">3 hrs ago</span>
->>>>>>> main
           </div>
         </div>
+        
+          {/* CAPTION SECTION (only if caption exists) */}
+          {currentFit.caption && currentFit.caption.trim() !== "" && (
+            <div className="px-3 py-2 rounded-2xl bg-white/80 border border-[#AFC7B6]/60 shadow-sm">
+              <p className="text-xs text-[#111827]">
+                <span className="font-semibold mr-1">
+                  {currentFit.username}
+                </span>
+                {currentFit.caption}
+              </p>
+            </div>
+          )}
 
-        {/* RATING SLIDER CENTERED BELOW CAROUSEL */}
+        {/* RATING SLIDER + CAPTION */}
         <div className="pt-0 px-5">
-            <Slider
-              min={0}
-              max={100}
-              step={1}
-              resetKey={currentIndex}
-              onLock={(num) => {
-                  alert(num);         // should pop 34, 57, etc
-                  setRating(num);
-                  a = num;
-                }}
-
-            />
+          <Slider
+            min={0}
+            max={100}
+            step={1}
+            resetKey={currentIndex}
+            onLock={(num) => {
+              alert(num); // still shows 34, 57, etc
+              setRating(num);
+            }}
+          />
           <p className="mt-2 text-xs text-[#5F7467] text-center">
             Rating for{" "}
             <span className="font-semibold text-[#1A3D2F]">
@@ -150,7 +158,7 @@ export default function HomePage() {
             </span>
             :{" "}
             <span className="font-semibold text-[#1A3D2F]">
-              {a}
+              {rating}
             </span>
             /100
           </p>
@@ -170,12 +178,14 @@ export default function HomePage() {
 
           {/* bottom sheet */}
           <div className="bg-[#F4F7F2] rounded-t-3xl p-4 pb-[calc(env(safe-area-inset-bottom)+25px)] max-h-[80vh] flex flex-col shadow-[0_-8px_24px_rgba(0,0,0,0.15)]">
-
             {/* header */}
             <div className="flex items-center justify-between mb-5 mt-3 ml-2 mr-2">
               <div className="flex items-center gap-3 ">
                 <Avatar className="h-9 w-9 border border-[#AFC7B6]">
-                  <AvatarImage src={currentFit.avatar} alt={currentFit.name} />
+                  <AvatarImage
+                    src={currentFit.avatar}
+                    alt={currentFit.name}
+                  />
                   <AvatarFallback>
                     {currentFit.name?.[0] || "👤"}
                   </AvatarFallback>
