@@ -9,7 +9,7 @@ export default function BottomNav({ activeTab = "outfit" }) {
   return (
     <nav className="rounded-full border-[2px] border-black bg-[#B8FFD8] px-4 py-2 flex items-center justify-between">
       <NavIcon href="/" icon={<Home />} label="Home" active={activeTab === "home"} />
-      <NavIcon href="/users" icon={<Users />} label="Users" active={activeTab === "users"} />
+      <NavIcon href="/friends" icon={<Users />} label="Friends" active={activeTab === "friends"} />
       <NavIcon href="/outfit" icon={<Shirt />} label="Outfit" active={activeTab === "outfit"} />
       <NavIcon href="/leaderboard" icon={<List />} label="Leaderboard" active={activeTab === "leaderboard"} />
       <NavIcon href="/profile" icon={<User />} label="Profile" active={activeTab === "profile"} />

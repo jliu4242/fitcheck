@@ -14,7 +14,7 @@ export default function HomePage() {
   return (
     <main className="min-h-screen bg-[#f3f3f3] flex flex-col">
       {/* Main content area */}
-      <div className="flex-1 flex flex-col gap-3 px-4 pt-4 pb-24 max-w-md w-full mx-auto">
+      <div className="flex-1 flex flex-col gap-3 px-4 pt-10 pb-24 max-w-md w-full mx-auto">
         {/* ==== TOP: user info ==== */}
         <header className="flex items-center gap-3">
           <Link href="/auth">
@@ -32,7 +32,7 @@ export default function HomePage() {
 
         {/* ==== IMAGE CARD ==== */}
         <FitsSlider />
-        <div className='pl-5 pr-5'>
+        <div className='pt-2 pl-5 pr-5'>
             <Slider/>
         </div>
       </div>
