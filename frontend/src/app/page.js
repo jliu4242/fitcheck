@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useCallback, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Card, CardContent } from "@/components/ui/card";
@@ -13,6 +13,20 @@ import BottomNav from "@/components/ui/BottomNav";
 export default function HomePage() {
   const [rating, setRating] = useState([40]);
   const [comment, setComment] = useState("");
+  const [fits, setFits] = useState(initialCards);
+
+  const handleSwipe = useCallback() {
+
+  }
+
+  useEffect(() = > {
+    const onKeyDown = (e) => {
+        if (e.key == "ArrowRight") {
+            e.preventDefault();
+            handleSwipe();
+        }
+    }
+  })
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-[#f3f3f3]">
@@ -39,7 +53,7 @@ export default function HomePage() {
             <CardContent className="p-0 h-full">
               <div className="relative w-full h-[380px]">
                 <Image
-                  src="/public/outfit sample.jpg"
+                  src="/guy.jpg"
                   alt="Outfit"
                   fill
                   className="object-cover"
