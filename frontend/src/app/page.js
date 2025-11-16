@@ -27,8 +27,6 @@ export default function HomePage() {
               <AvatarFallback className="text-lg">👤</AvatarFallback>
             </Avatar>
           </Link>
-{/* ==== IMAGE CARD ==== */}
-          <FitsSlider />
 
           <div className="flex flex-col leading-tight">
             <span className="text-sm font-semibold">You</span>
@@ -37,21 +35,10 @@ export default function HomePage() {
         </header>
 
         {/* ==== IMAGE CARD ==== */}
-        <Card className="mt-1 flex-1 rounded-3xl overflow-hidden border-0 bg-slate-50 shadow-sm">
-          <CardContent className="p-0 h-full">
-            <div className="relative w-full h-[380px]">
-              <Image
-                src="/guy.jpg"
-                alt="Outfit"
-                fill
-                className="object-cover"
-              />
-            </div>
-          </CardContent>
-        </Card>
+        <FitsSlider />
 
         {/* ==== SLIDER ==== */}
-        <div className="flex flex-col items-center gap-1">
+        <div className="flex flex-col items-center gap-1 p-2">
           <Slider
             value={rating}
             onValueChange={setRating}

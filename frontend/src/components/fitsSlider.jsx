@@ -30,8 +30,8 @@ export default function fitsSlider() {
     const renderEvent = (fit) => {
         return (
             <Card className="mt-1 flex-1 rounded-3xl overflow-hidden border-0 bg-slate-50 shadow-sm">
-                <CardContent className="p-0 h-full">
-                    <div className="relative w-full h-[380px]">
+                <CardContent className="p-0 h-[55dvh]">
+                    <div className="relative w-full h-full">
                         <Image
                             src={fit.image}
                             alt={fit.alt}
