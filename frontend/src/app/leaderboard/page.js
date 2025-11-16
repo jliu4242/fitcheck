@@ -1,6 +1,6 @@
 "use client"
 
-import React from "react"
+import React, { useEffect, useState } from "react"
 import BottomNav from "@/components/ui/BottomNav";
 
 import {
@@ -17,46 +17,79 @@ import {
 } from "@/components/ui/avatar"
 import { useAuth } from "@/context/authContext";
 
-const leaderboardData = [
-  {
-    id: 1,
-    name: "You",
-    username: "@you",
-    avgRating: 4.9,
-    totalRatings: 87,
-  },
-  {
-    id: 2,
-    name: "Emily Chen",
-    username: "@emchen",
-    avgRating: 4.7,
-    totalRatings: 63,
-  },
-  {
-    id: 3,
-    name: "Rizky",
-    username: "@riz",
-    avgRating: 4.6,
-    totalRatings: 51,
-  },
-  {
-    id: 4,
-    name: "Daniel Park",
-    username: "@dpark",
-    avgRating: 4.5,
-    totalRatings: 39,
-  },
-  {
-    id: 5,
-    name: "Sarah Lee",
-    username: "@sarah",
-    avgRating: 4.4,
-    totalRatings: 28,
-  },
-]
+// const leaderboardData = [
+//   {
+//     id: 1,
+//     name: "You",
+//     username: "@you",
+//     avgRating: 4.9,
+//     totalRatings: 87,
+//   },
+//   {
+//     id: 2,
+//     name: "Emily Chen",
+//     username: "@emchen",
+//     avgRating: 4.7,
+//     totalRatings: 63,
+//   },
+//   {
+//     id: 3,
+//     name: "Rizky",
+//     username: "@riz",
+//     avgRating: 4.6,
+//     totalRatings: 51,
+//   },
+//   {
+//     id: 4,
+//     name: "Daniel Park",
+//     username: "@dpark",
+//     avgRating: 4.5,
+//     totalRatings: 39,
+//   },
+//   {
+//     id: 5,
+//     name: "Sarah Lee",
+//     username: "@sarah",
+//     avgRating: 4.4,
+//     totalRatings: 28,
+//   },
+// ]
 
 export default function LeaderboardPage() {
     const { user, token } = useAuth();
+    const [data, setData] = useState([]);
+
+    function createData(users) {
+        const data = data.map((item, index) => ({
+            i: index + 1,
+            name: item.user_id,
+            avgRating: item.avg_rating,
+        }))
+    }
+
+    useEffect(() => {
+        async function fetchData() {
+            const res = await fetch("http://localhost:8000/leaderboard/", {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                },
+            })
+            var data = await res.json();
+            console.log("Raw data:", data); // ← Check what this logs
+            console.log("Is array?", Array.isArray(data)); // ← Check if it's an array
+            if (data.length > 5) {
+                data = data.slice(0,5);
+            }
+            setData(data && data.map((item, index) => ({
+                i: index + 1,
+                name: item.user_id,
+                avgRating: item.average_rating,
+            })))
+        }
+        
+        fetchData();
+    }, [token]);
 
   return (
     <div className="flex min-h-screen flex-col bg-background text-foreground">
@@ -83,7 +116,7 @@ export default function LeaderboardPage() {
           </CardHeader>
 
           <CardContent className="space-y-3">
-            {leaderboardData.map((user, index) => (
+            {data.map((user, index) => (
               <div
                 key={user.id}
                 className="flex items-center justify-between rounded-xl bg-muted/60 px-4 py-3"
@@ -110,9 +143,9 @@ export default function LeaderboardPage() {
                     <span className="text-sm font-medium leading-none">
                       {user.name}
                     </span>
-                    <span className="text-xs text-muted-foreground">
+                    {/* <span className="text-xs text-muted-foreground">
                       {user.username}
-                    </span>
+                    </span> */}
                   </div>
                 </div>
 
@@ -122,9 +155,9 @@ export default function LeaderboardPage() {
                     {user.avgRating.toFixed(1)}
                     <span className="text-xs text-muted-foreground"> / 5</span>
                   </span>
-                  <span className="text-[11px] text-muted-foreground">
+                  {/* <span className="text-[11px] text-muted-foreground">
                     {user.totalRatings} ratings
-                  </span>
+                  </span> */}
                 </div>
               </div>
             ))}
