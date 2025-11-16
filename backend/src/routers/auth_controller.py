@@ -5,6 +5,7 @@ from ..dto.auth_schemas import SignupRequest, SignUpResponse, LoginRequest, Logi
 from ..service.auth_service import AuthService
 from ..models.users import User
 from ..dependencies import get_current_user
+from ..dto.user_schemas import UsernameResponse
 
 router = APIRouter(prefix="/api/auth", tags=["auth"])
 service = AuthService()

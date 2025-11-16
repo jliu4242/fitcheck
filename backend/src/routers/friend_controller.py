@@ -15,10 +15,10 @@ def add_friend(username_to_add: str, db: Session = Depends(get_db), current_user
     except ValueError as e:
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=str(e))
     
-@router.get("/get-all-friends/{user_id}", status_code=status.HTTP_200_OK)
-def get_add_friends(user_id: str, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+@router.get("/get-all-friends", status_code=status.HTTP_200_OK)
+def get_add_friends(db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
     try:
-        return service.get_all_friends(db, user_id)
+        return service.get_all_friends(db, current_user.user_id)
     except ValueError as e:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
     

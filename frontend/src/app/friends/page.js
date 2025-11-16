@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { Search } from "lucide-react";
 
 import { Input } from "@/components/ui/input";
@@ -19,18 +19,98 @@ const ALL_USERS = [
 export default function FriendsPage() {
   const [search, setSearch] = useState("");
   const [friends, setFriends] = useState([]);
+  const [nonFriends, setNonFriends] = useState([]);
   const [activeTab, setActiveTab] = useState("find"); // "find" | "list"
+  const [loading, setLoading] = useState(true);
   const { user, token } = useAuth();
 
-  const nonFriends = useMemo(
-    () =>
-      ALL_USERS.filter(
-        (u) =>
-          !friends.some((f) => f.id === u.id) &&
-          u.name.toLowerCase().includes(search.toLowerCase())
-      ),
-    [friends, search]
-  );
+  useEffect(() => {
+    async function fetchData() {
+        try {
+            setLoading(true);
+            const res = await fetch(`http://localhost:8000/api/users/search/${search}`, {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                },
+            });
+
+            if (!res.ok) {
+                throw new Error('Failed to fetch leaderboard');
+            }
+
+            const responseData = await res.json();
+            console.log("Raw data:", responseData);
+            console.log("Is array?", Array.isArray(responseData));
+            
+            if (Array.isArray(responseData)) {
+                
+                const transformed = responseData.map((item, index) => ({
+                    id: index + 1,
+                    name: item.username,
+                    avgRating: item.average_rating ?? 0,
+                    totalRatings: item.total_ratings ?? 0,
+                }));
+                
+                setNonFriends(transformed);
+            } else {
+                console.error("Data is not an array:", responseData);
+            }
+        } catch (err) {
+            console.error("Fetch error:", err);
+        } finally {
+            setLoading(false);
+        }
+    }
+    
+    if (token) {
+        fetchData();
+    }
+}, [token]);
+
+  useEffect(() => {
+        async function fetchData() {
+            try {
+                setLoading(true);
+                const res = await fetch("http://localhost:8000/api/friend/get-all-friends", {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                    },
+                });
+
+                if (!res.ok) {
+                    throw new Error('Failed to fetch leaderboard');
+                }
+
+                const responseData = await res.json();
+                console.log("Raw data:", responseData);
+                console.log("Is array?", Array.isArray(responseData));
+                
+                if (Array.isArray(responseData)) {
+                    
+                    const transformed = responseData.map((item, index) => ({
+                        id: index + 1,
+                        name: item.username,
+                        avgRating: item.average_rating ?? 0,
+                        totalRatings: item.total_ratings ?? 0,
+                    }));
+                    
+                    setFriends(transformed);
+                } else {
+                    console.error("Data is not an array:", responseData);
+                }
+            } catch (err) {
+                console.error("Fetch error:", err);
+            } finally {
+                setLoading(false);
+            }
+        }
+        
+        if (token) {
+            fetchData();
+        }
+    }, [token]);
 
   const handleAdd = (user) => {
     if (!friends.some((f) => f.id === user.id)) {
