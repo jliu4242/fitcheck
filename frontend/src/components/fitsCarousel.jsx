@@ -5,20 +5,28 @@ import {
   Carousel,
   CarouselContent,
   CarouselItem,
-} from "@/components/ui/carousel"; // ← your file
+} from "@/components/ui/carousel";
 
-export default function FitsCarousel({ items = [], onSlideChange }) {
+const fallbackImage = "/fits/guy.jpg";
+
+export default function FitsCarousel({
+  items = [],
+  onSlideChange = () => {},
+}) {
   const [api, setApi] = React.useState(null);
 
   React.useEffect(() => {
     if (!api) return;
 
     const handleSelect = () => {
-      const idx = api.selectedScrollSnap();
-      if (onSlideChange) onSlideChange(idx);
+      // selectedScrollSnap() returns the current slide index (0-based)
+      const idx = api.selectedScrollSnap?.();
+      if (typeof idx === "number") {
+        onSlideChange(idx);
+      }
     };
 
-    // fire once initially
+    // run once when api is ready
     handleSelect();
 
     api.on("select", handleSelect);
@@ -30,12 +38,18 @@ export default function FitsCarousel({ items = [], onSlideChange }) {
     };
   }, [api, onSlideChange]);
 
-  const fallbackImage = "/fits/guy.jpg";
+  if (!items || items.length === 0) {
+    return (
+      <div className="w-full rounded-3xl border-[3px] border-[#1A3D2F] bg-[#E7EEE3] flex items-center justify-center aspect-[3/4]">
+        <span className="text-sm text-gray-600">No outfits yet</span>
+      </div>
+    );
+  }
 
   return (
     <Carousel
       setApi={setApi}
-      opts={{ loop: true }}
+      opts={{ loop: false }}
       className="w-full"
     >
       <CarouselContent>
@@ -44,12 +58,12 @@ export default function FitsCarousel({ items = [], onSlideChange }) {
 
           return (
             <CarouselItem key={item.id ?? i}>
-              <div className="w-full relative rounded-3xl border-[3px] border-[#1A3D2F] overflow-hidden bg-[#E7EEE3]">
+              <div className="w-full h-[450px] relative rounded-3xl border-[3px] border-[#1A3D2F] overflow-hidden bg-[#E7EEE3]">
                 <div className="aspect-[3/4] w-full">
                   <img
                     src={imageSrc}
                     alt={item.name || "Outfit"}
-                    className="w-full h-full object-cover"
+                    className="w-full h-full object-fill"
                   />
                 </div>
               </div>
