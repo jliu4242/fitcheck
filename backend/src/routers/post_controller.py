@@ -18,6 +18,7 @@ async def create_post(
                     current_user: User = Depends(get_current_user)
                     ):
     try:
+        print("endpoint reached")
         return await service.create_post(db, current_user.user_id, caption, image)
     except ValueError as e:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
