@@ -36,7 +36,7 @@ export default function fitsSlider() {
                             src={fit.image}
                             alt={fit.alt}
                             fill
-                            className="object-cover p-1.5"
+                            className="object-fill p-1.5"
                         />
                     </div>
                     <div className='pl-5 pr-5'>

@@ -26,7 +26,7 @@ export default function HomePage() {
 
           <div className="flex flex-col leading-tight">
             <span className="text-sm font-semibold">You</span>
-            <span className="text-xs text-muted-foreground">3hrs ago</span>
+            <span className="text-xs text-muted-foreground">3 hrs ago</span>
           </div>
         </header>
 
