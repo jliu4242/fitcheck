@@ -38,7 +38,7 @@ export default function HomePage() {
         setLoading(true);
 
         // 1) fetch posts
-        const res = await fetch("http://localhost:8000/api/posts/get-recent", {
+        const res = await fetch("http://3.98.128.26/api/posts/get-recent", {
           method: "POST",
           headers: {
             Authorization: `Bearer ${token}`,
@@ -69,7 +69,7 @@ export default function HomePage() {
           userIds.map(async (userId) => {
             try {
               const userRes = await fetch(
-                `http://localhost:8000/api/users/${userId}`,
+                `http://3.98.128.26/api/users/${userId}`,
                 {
                   headers: {
                     Authorization: `Bearer ${token}`,
@@ -159,7 +159,7 @@ export default function HomePage() {
 
     try {
       const res = await fetch(
-        "http://localhost:8000/ratings/create-rating",
+        "http://3.98.128.26/ratings/create-rating",
         {
           method: "POST",
           headers: {

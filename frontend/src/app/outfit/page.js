@@ -96,7 +96,7 @@ export default function CameraPage() {
       formData.append('caption', caption);
       formData.append('image', file);
       
-      const res = await fetch('http://localhost:8000/api/posts/create', {
+      const res = await fetch('http://3.98.128.26/api/posts/create', {
         method: "POST",
         headers: {
           'Authorization': `Bearer ${token}`,

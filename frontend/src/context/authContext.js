@@ -23,7 +23,7 @@ export function AuthProvider({ children }) {
   const login = async (email, password) => {
     console.log("hello");
     try {
-      const res = await fetch('http://localhost:8000/api/auth/login', {
+      const res = await fetch('http://3.98.128.26/api/auth/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -65,7 +65,7 @@ export function AuthProvider({ children }) {
   const register = async (email, password, username) => {
     console.log("hello");
     try {
-      const res = await fetch('http://localhost:8000/api/auth/signup', {
+      const res = await fetch('http://3.98.128.26/api/auth/signup', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
