@@ -5,6 +5,7 @@ from ..dto.auth_schemas import SignupRequest, SignUpResponse, LoginRequest, Logi
 from ..service.auth_service import AuthService
 from ..models.users import User
 from ..dependencies import get_current_user
+from ..dto.user_schemas import UsernameResponse
 
 router = APIRouter(prefix="/api/auth", tags=["auth"])
 service = AuthService()
@@ -25,7 +26,7 @@ def login(data: LoginRequest, db: Session = Depends(get_db)):
     except ValueError as e:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=str(e))
     
-@router.get("/users/{user_id}")
+@router.get("/users/{user_id}", response_model=UsernameResponse)
 def get_user_by_id(
     user_id: str,
     db: Session = Depends(get_db),
@@ -35,6 +36,4 @@ def get_user_by_id(
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
     
-    return {
-        "username": user.username
-    }
+    return UsernameResponse(username=user.username)

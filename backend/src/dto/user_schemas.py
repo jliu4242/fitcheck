@@ -20,3 +20,6 @@ Response DTOs
 class UserPublicResponse(BaseModel):
     username: str
     profile_picture_url: Optional[str] = None
+    
+class UsernameResponse(BaseModel):
+    username: str

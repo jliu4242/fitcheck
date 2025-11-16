@@ -59,6 +59,7 @@ export default function FitsCarousel({
       fetchData();
     }
   }, [token]);
+  
 
   useEffect(() => {
     if (!api) return;
