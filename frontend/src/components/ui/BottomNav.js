@@ -29,7 +29,7 @@ function NavIcon({ href, icon, label, active }) {
           <motion.span
             layoutId="nav-active-circle"
             className="absolute inset-0 rounded-full bg-[#F4FFE3]"
-            transition={{ type: "spring", stiffness: 400, damping: 30 }}
+            transition={{ type: "spring", stiffness: 350, damping: 28 }}
           />
         )}
 

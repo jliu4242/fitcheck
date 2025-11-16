@@ -18,7 +18,7 @@ export default function AuthPage() {
   const isLogin = mode === "login";
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4 bg-gradient-to-b from-background via-background to-muted">
+    <div className="min-h-screen flex items-center justify-center px-4 pt-4 pb-5 bg-gradient-to-b from-background via-background to-muted">
       <Card className="w-full max-w-md bg-background/70 backdrop-blur-xl border-border/60 shadow-xl rounded-3xl">
         <CardHeader className="space-y-2 text-center">
           <CardTitle className="text-2xl font-semibold tracking-tight">
@@ -60,7 +60,13 @@ export default function AuthPage() {
           </div>
 
           {/* Forms */}
-          <div className="pt-2">{isLogin ? <LoginForm /> : <SignupForm />}</div>
+          <div className="pt-2">
+            {isLogin ? (
+              <LoginForm switchToSignup={() => setMode("signup")} />
+            ) : (
+              <SignupForm switchToLogin={() => setMode("login")} />
+            )}
+          </div>
         </CardContent>
       </Card>
     </div>

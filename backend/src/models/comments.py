@@ -3,6 +3,7 @@ from sqlalchemy import Column, Text, DateTime, ForeignKey
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
 import uuid
+from pydantic import BaseModel
 
 from .base import Base
 

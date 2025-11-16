@@ -18,6 +18,7 @@ const ALL_USERS = [
 export default function FriendsPage() {
   const [search, setSearch] = useState("");
   const [friends, setFriends] = useState([]);
+  const [activeTab, setActiveTab] = useState("find"); // "find" | "list"
 
   const nonFriends = useMemo(
     () =>
@@ -41,96 +42,129 @@ export default function FriendsPage() {
         {/* Page title + subtitle (like leaderboard) */}
         <header className="mb-4 text-center">
           <h1 className="text-2xl font-semibold text-slate-900">
-            Add Friend
+            Friends
           </h1>
           <p className="text-xs text-slate-500 mt-1">
-            Find your friends and add them to your list.
+            Find new friends or manage your friend list.
           </p>
         </header>
 
-        {/* Main white card container (like leaderboard card) */}
+        {/* Main white card container */}
         <Card className="rounded-3xl shadow-lg border border-slate-100 bg-white">
           <CardContent className="p-4 space-y-5">
-            {/* Search bar */}
-            <div>
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-                <Input
-                  placeholder="Find your friend here..."
-                  className="pl-9 rounded-full bg-slate-50 border-slate-200 focus-visible:ring-1 focus-visible:ring-slate-300"
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
-                />
-              </div>
+            {/* Top tab switcher */}
+            <div className="bg-slate-100 rounded-full p-1 flex text-xs font-semibold mb-2">
+              <button
+                type="button"
+                onClick={() => setActiveTab("find")}
+                className={
+                  "flex-1 py-2 rounded-full transition " +
+                  (activeTab === "find"
+                    ? "bg-white text-slate-900 shadow-sm"
+                    : "text-slate-500")
+                }
+              >
+                Find Friends
+              </button>
+              <button
+                type="button"
+                onClick={() => setActiveTab("list")}
+                className={
+                  "flex-1 py-2 rounded-full transition " +
+                  (activeTab === "list"
+                    ? "bg-white text-slate-900 shadow-sm"
+                    : "text-slate-500")
+                }
+              >
+                Friend List
+              </button>
             </div>
 
-            {/* People you may know */}
-            <section>
-              <h2 className="text-sm font-semibold text-slate-800 mb-2">
-                Friends suggestion
-              </h2>
+            {/* TAB: FIND FRIENDS */}
+            {activeTab === "find" && (
+              <div className="space-y-5">
+                {/* Search bar */}
+                <div>
+                  <div className="relative">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                    <Input
+                      placeholder="Find your friend here..."
+                      className="pl-9 rounded-full bg-slate-50 border-slate-200 focus-visible:ring-1 focus-visible:ring-slate-300"
+                      value={search}
+                      onChange={(e) => setSearch(e.target.value)}
+                    />
+                  </div>
+                </div>
 
-              <div className="space-y-3">
-                {nonFriends.map((user) => (
-                  <Card
-                    key={user.id}
-                    className="bg-slate-100 rounded-2xl border-0 shadow-none"
-                  >
-                    <CardContent className="py-3 px-3 flex items-center justify-between gap-3">
-                      <div className="flex items-center gap-3">
-                        <Avatar className="h-9 w-9 bg-slate-700">
-                          <AvatarFallback className="text-white text-sm">
-                            {user.name[0]}
-                          </AvatarFallback>
-                        </Avatar>
-                        <div className="flex flex-col">
-                          <span className="font-medium text-sm text-slate-900">
-                            {user.name}
-                          </span>
-                          <span className="text-[11px] text-slate-500">
-                            Suggested friend
-                          </span>
-                        </div>
-                      </div>
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        className="rounded-full px-4 text-xs font-semibold border-slate-300 hover:bg-slate-900 hover:text-white"
-                        onClick={() => handleAdd(user)}
+                {/* People you may know */}
+                <section>
+                  <h2 className="text-sm font-semibold text-slate-800 mb-2">
+                    Friends suggestion
+                  </h2>
+
+                  <div className="space-y-3">
+                    {nonFriends.map((user) => (
+                      <Card
+                        key={user.id}
+                        className="bg-slate-100 rounded-2xl border-0 shadow-none"
                       >
-                        Add
-                      </Button>
-                    </CardContent>
-                  </Card>
-                ))}
+                        <CardContent className="py-2 px-3 flex items-center justify-between gap-3">
+                          <div className="flex items-center gap-3">
+                            <Avatar className="h-9 w-9 bg-slate-700">
+                              <AvatarFallback className="text-white text-sm">
+                                {user.name[0]}
+                              </AvatarFallback>
+                            </Avatar>
+                            <div className="flex flex-col">
+                              <span className="font-medium text-sm text-slate-900">
+                                {user.name}
+                              </span>
+                              <span className="text-[11px] text-slate-500">
+                                Suggested friend
+                              </span>
+                            </div>
+                          </div>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="rounded-full px-4 text-xs font-semibold border-slate-300 hover:bg-slate-900 hover:text-white"
+                            onClick={() => handleAdd(user)}
+                          >
+                            Add
+                          </Button>
+                        </CardContent>
+                      </Card>
+                    ))}
 
-                {nonFriends.length === 0 && (
-                  <p className="text-xs text-slate-500 text-center py-2">
-                    No more people to add with this search.
+                    {nonFriends.length === 0 && (
+                      <p className="text-xs text-slate-500 text-center py-2">
+                        No more people to add with this search.
+                      </p>
+                    )}
+                  </div>
+                </section>
+              </div>
+            )}
+
+            {/* TAB: FRIEND LIST */}
+            {activeTab === "list" && (
+              <section className="space-y-3">
+                <h2 className="text-sm font-semibold text-slate-800 mb-2">
+                  Your friends
+                </h2>
+
+                {friends.length === 0 && (
+                  <p className="text-xs text-slate-500 text-center py-4">
+                    You haven&apos;t added any friends yet.
                   </p>
                 )}
-              </div>
-            </section>
 
-            {/* Friend list */}
-            <section>
-              <h2 className="text-sm font-semibold text-slate-800 mb-2">
-                Your friends
-              </h2>
-
-              {friends.length === 0 && (
-                <p className="text-xs text-slate-500">
-                  You haven&apos;t added any friends yet.
-                </p>
-              )}
-
-              <div className="space-y-3">
                 {friends.map((user) => (
                   <Card
                     key={user.id}
                     className="bg-slate-100 rounded-2xl border-0 shadow-none"
                   >
-                    <CardContent className="py-3 px-3 flex items-center gap-3">
+                    <CardContent className="py-2 px-3 flex items-center gap-3">
                       <Avatar className="h-9 w-9 bg-slate-700">
                         <AvatarFallback className="text-white text-sm">
                           {user.name[0]}
@@ -147,8 +181,8 @@ export default function FriendsPage() {
                     </CardContent>
                   </Card>
                 ))}
-              </div>
-            </section>
+              </section>
+            )}
           </CardContent>
         </Card>
       </main>
