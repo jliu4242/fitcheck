@@ -127,10 +127,10 @@ export default function LeaderboardPage() {
         </Card>
       </main>
 
-      {/* Bottom navigation (reusable) */}
-      <div className="fixed inset-x-0 bottom-0 px-4 pb-[calc(env(safe-area-inset-bottom)+16px)]">
-        <BottomNav />
-      </div>
+      {/* ==== BOTTOM NAVIGATION (fixed) ==== */}
+        <div className="fixed inset-x-0 bottom-0 px-4 pb-[calc(env(safe-area-inset-bottom)+12px)]">
+            <BottomNav activeTab="leaderboard" />
+        </div>
     </div>
   )
 }
