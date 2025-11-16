@@ -57,28 +57,33 @@ const leaderboardData = [
 export default function LeaderboardPage() {
   return (
     <div className="flex min-h-screen flex-col bg-background text-foreground">
+      
       {/* Page content */}
-      <main className="flex-1 px-4 pb-24 pt-6">
-        <header className="mb-4">
-          <h1 className="text-2xl font-bold tracking-tight">
+      <main className="flex-1 px-4 pb-24 pt-20 max-w-md mx-auto">
+        
+        {/* Header */}
+        <header className="mb-8 text-center">
+          <h1 className="text-3xl font-bold tracking-tight">
             Leaderboard
           </h1>
-          <p className="text-sm text-muted-foreground">
+          <p className="text-sm text-muted-foreground mt-2">
             See how your average rating compares to your friends.
           </p>
         </header>
 
+        {/* Leaderboard Card */}
         <Card className="border-none bg-card/80 shadow-sm">
           <CardHeader>
             <CardTitle className="text-base">
               Friends rating ranking
             </CardTitle>
           </CardHeader>
+
           <CardContent className="space-y-3">
             {leaderboardData.map((user, index) => (
               <div
                 key={user.id}
-                className="flex items-center justify-between rounded-xl bg-muted/60 px-3 py-2"
+                className="flex items-center justify-between rounded-xl bg-muted/60 px-4 py-3"
               >
                 {/* Left: rank + avatar + name */}
                 <div className="flex items-center gap-3">
@@ -112,10 +117,7 @@ export default function LeaderboardPage() {
                 <div className="flex flex-col items-end">
                   <span className="text-sm font-semibold">
                     {user.avgRating.toFixed(1)}
-                    <span className="text-xs text-muted-foreground">
-                      {" "}
-                      / 5
-                    </span>
+                    <span className="text-xs text-muted-foreground"> / 5</span>
                   </span>
                   <span className="text-[11px] text-muted-foreground">
                     {user.totalRatings} ratings
@@ -127,10 +129,10 @@ export default function LeaderboardPage() {
         </Card>
       </main>
 
-      {/* ==== BOTTOM NAVIGATION (fixed) ==== */}
-        <div className="fixed inset-x-0 bottom-2 px-4 pb-[calc(env(safe-area-inset-bottom)+12px)]">
-            <BottomNav activeTab="leaderboard" />
-        </div>
+      {/* Bottom Navigation */}
+      <div className="fixed inset-x-0 bottom-2 px-4 pb-[calc(env(safe-area-inset-bottom)+12px)]">
+        <BottomNav activeTab="leaderboard" />
+      </div>
     </div>
   )
 }
