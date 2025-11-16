@@ -14,16 +14,20 @@ export default function CameraPage() {
 
   // Start camera
   useEffect(() => {
+    let stream = null;
+
     async function startCamera() {
       try {
-        const stream = await navigator.mediaDevices.getUserMedia({
+        stream = await navigator.mediaDevices.getUserMedia({
           video: { facingMode: "user" },
           audio: false,
         });
 
         if (videoRef.current) {
           videoRef.current.srcObject = stream;
-          await videoRef.current.play();
+          videoRef.current.onloadedmetadata = () => {
+            videoRef.current.play();
+          };
         }
       } catch (err) {
         console.error(err);
@@ -31,14 +35,22 @@ export default function CameraPage() {
       }
     }
 
-    startCamera();
+    // Only start camera when not showing photo
+    if (!hasPhoto) {
+      startCamera();
+    }
 
     return () => {
+      // Stop camera stream when component unmounts or when taking photo
+      if (stream) {
+        stream.getTracks().forEach((track) => track.stop());
+      }
       if (videoRef.current?.srcObject) {
-        videoRef.current.srcObject.getTracks().forEach((t) => t.stop());
+        const tracks = videoRef.current.srcObject.getTracks();
+        tracks.forEach((track) => track.stop());
       }
     };
-  }, []);
+  }, [hasPhoto]); // Re-run when hasPhoto changes
 
   const takePhoto = () => {
     const video = videoRef.current;
@@ -59,6 +71,7 @@ export default function CameraPage() {
   const retake = () => {
     setHasPhoto(false);
     setCaption("");
+    setError("");
   };
 
   const postPhoto = async () => {
@@ -79,7 +92,7 @@ export default function CameraPage() {
       const formData = new FormData();
       formData.append('caption', caption);
       formData.append('image', file);
-
+      
       const authToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0QGdtYWlsLmNvbSIsImV4cCI6MTc2Mzg4NDQ3M30.k1ZSxV3GyycmZ4mDCg-CzjpB3393Ul-e4SZM4KnGgAA";
 
       const res = await fetch('http://localhost:8000/api/posts/create', {
@@ -122,17 +135,17 @@ export default function CameraPage() {
         {/* Camera / Preview */}
         <div className="w-full flex-1 flex flex-col justify-center">
           <div className="w-full aspect-[3/4] bg-black rounded-2xl overflow-hidden shadow-md">
-            {!hasPhoto ? (
-              <video
-                ref={videoRef}
-                className="w-full h-full object-cover"
-                autoPlay
-                playsInline
-                muted
-              />
-            ) : (
-              <canvas ref={canvasRef} className="w-full h-full object-cover" />
-            )}
+            <video
+              ref={videoRef}
+              className={`w-full h-full object-cover ${hasPhoto ? 'hidden' : ''}`}
+              autoPlay
+              playsInline
+              muted
+            />
+            <canvas 
+              ref={canvasRef} 
+              className={`w-full h-full object-cover ${!hasPhoto ? 'hidden' : ''}`}
+            />
           </div>
 
           {error && (
@@ -189,9 +202,6 @@ export default function CameraPage() {
       <div className="fixed inset-x-0 bottom-2 px-4 pb-[calc(env(safe-area-inset-bottom)+12px)]">
         <BottomNav activeTab="outfit" />
       </div>
-
-      {/* Hidden canvas for capture */}
-      <canvas ref={canvasRef} className="hidden" />
     </div>
   );
 }
