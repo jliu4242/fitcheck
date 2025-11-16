@@ -4,6 +4,12 @@ from sqlalchemy import create_engine
 
 # Import all models to register them with Base
 from src.models.base import Base
+from src.models.users import User
+from src.models.friends import Friend
+from src.models.posts import Post
+from src.models.ratings import Rating
+from src.models.comments import Comment
+from src.models.average_ratings import AverageRating
 
 load_dotenv()
 

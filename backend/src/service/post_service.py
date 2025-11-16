@@ -1,4 +1,5 @@
 from ..repository.post_repository import PostRepository
+from ..repository.average_rating_repository import AverageRatingRepository
 from sqlalchemy.orm import Session
 from ..models.users import User
 from ..service.jwt_service import JwtService
@@ -7,6 +8,7 @@ from ..dto.post_schemas import PostResponse
 from fastapi import UploadFile, HTTPException, status
 from uuid import UUID, uuid4
 from ..models.posts import Post
+from ..models.average_ratings import AverageRating
 
 jwt_service = JwtService()
 image_service = ImageService()
@@ -15,6 +17,7 @@ class PostService:
 
     def __init__(self):
         self.repo = PostRepository()
+        self.average_rating_repo = AverageRatingRepository()
 
     async def create_post(self, db: Session, user_id: UUID, caption: str, image: UploadFile) -> PostResponse:
         
@@ -47,6 +50,14 @@ class PostService:
             caption=caption
         )
         self.repo.create_post(db, post)
+
+        avg = AverageRating(
+            user_id=user_id,
+            post_id=post.post_id,
+            created_at=post.created_at,
+            average_rating=0
+        )
+        self.average_rating_repo.create(db, avg)
 
         return post
     
