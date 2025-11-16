@@ -66,10 +66,10 @@ export default function CameraPage() {
 
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col">
-      <main className="flex-1 w-full max-w-md mx-auto px-4 pt-6 pb-32 flex flex-col gap-4">
+      <main className="flex-1 w-full max-w-md mx-auto px-4 pt-13 pb-32 flex flex-col gap-4">
         {/* Title & Subtitle */}
         <header className="text-center">
-          <h1 className="text-2xl font-semibold text-slate-900">Camera</h1>
+          <h1 className="text-2xl font-semibold text-slate-900">Share Your Outfit</h1>
           <p className="text-xs text-slate-500 mt-1">
             Take a photo and post it.
           </p>
@@ -97,7 +97,7 @@ export default function CameraPage() {
         </div>
 
         {/* Buttons */}
-        <div className="flex justify-center gap-3 mt-3">
+        <div className="flex justify-center gap-3 mt-2">
           {!hasPhoto ? (
             <Button
               className="rounded-full px-6 text-sm font-semibold"
@@ -128,7 +128,7 @@ export default function CameraPage() {
 
       {/* ⭐ Bottom Navigation (fixed) */}
       <div className="fixed inset-x-0 bottom-2 px-4 pb-[calc(env(safe-area-inset-bottom)+12px)]">
-        <BottomNav activeTab="camera" />
+        <BottomNav activeTab="outfit" />
       </div>
 
       {/* Hidden canvas */}
