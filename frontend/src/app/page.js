@@ -8,25 +8,12 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Slider } from "@/components/ui/slider";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import FitsSlider from "@/components/fitsSlider";
 import BottomNav from "@/components/ui/BottomNav";
 
 export default function HomePage() {
   const [rating, setRating] = useState([40]);
   const [comment, setComment] = useState("");
-  const [fits, setFits] = useState(initialCards);
-
-  const handleSwipe = useCallback() {
-
-  }
-
-  useEffect(() = > {
-    const onKeyDown = (e) => {
-        if (e.key == "ArrowRight") {
-            e.preventDefault();
-            handleSwipe();
-        }
-    }
-  })
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-[#f3f3f3]">
@@ -49,18 +36,7 @@ export default function HomePage() {
           </header>
 
           {/* ==== IMAGE CARD ==== */}
-          <Card className="mt-1 flex-1 rounded-3xl overflow-hidden border-0 bg-slate-50 shadow-sm">
-            <CardContent className="p-0 h-full">
-              <div className="relative w-full h-[380px]">
-                <Image
-                  src="/guy.jpg"
-                  alt="Outfit"
-                  fill
-                  className="object-cover"
-                />
-              </div>
-            </CardContent>
-          </Card>
+          <FitsSlider />
 
           {/* ==== SLIDER ==== */}
           <div className="flex flex-col items-center gap-1">
