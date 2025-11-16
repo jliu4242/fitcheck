@@ -23,78 +23,58 @@ const rankColors = {
   3: "#CD7F32", // Bronze
   default: "#B4C8B1", // Soft Green for others
 };
-// const leaderboardData = [
-//   {
-//     id: 1,
-//     name: "You",
-//     username: "@you",
-//     avgRating: 4.9,
-//     totalRatings: 87,
-//   },
-//   {
-//     id: 2,
-//     name: "Emily Chen",
-//     username: "@emchen",
-//     avgRating: 4.7,
-//     totalRatings: 63,
-//   },
-//   {
-//     id: 3,
-//     name: "Rizky",
-//     username: "@riz",
-//     avgRating: 4.6,
-//     totalRatings: 51,
-//   },
-//   {
-//     id: 4,
-//     name: "Daniel Park",
-//     username: "@dpark",
-//     avgRating: 4.5,
-//     totalRatings: 39,
-//   },
-//   {
-//     id: 5,
-//     name: "Sarah Lee",
-//     username: "@sarah",
-//     avgRating: 4.4,
-//     totalRatings: 28,
-//   },
-// ]
 
 export default function LeaderboardPage() {
     const { user, token } = useAuth();
     const [data, setData] = useState([]);
-
-    function createData(users) {
-        const data = data.map((item, index) => ({
-            i: index + 1,
-            name: item.user_id,
-            avgRating: item.avg_rating,
-        }))
-    }
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         async function fetchData() {
-            const res = await fetch("http://localhost:8000/leaderboard/", {
-                method: 'GET',
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                },
-            })
-            var data = await res.json();
-            console.log("Raw data:", data); // ← Check what this logs
-            console.log("Is array?", Array.isArray(data)); // ← Check if it's an array
-            if (data.length > 5) {
-                data = data.slice(0,5);
+            try {
+                setLoading(true);
+                const res = await fetch("http://localhost:8000/leaderboard/", {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                    },
+                });
+
+                if (!res.ok) {
+                    throw new Error('Failed to fetch leaderboard');
+                }
+
+                const responseData = await res.json();
+                console.log("Raw data:", responseData);
+                console.log("Is array?", Array.isArray(responseData));
+                
+                if (Array.isArray(responseData)) {
+                    // Take top 5
+                    const topFive = responseData.slice(0, 5);
+                    
+                    // Transform data
+                    const transformed = topFive.map((item, index) => ({
+                        id: index + 1,
+                        name: item.user_id || 'Unknown',
+                        username: `@${item.user_id || 'unknown'}`,
+                        avgRating: item.average_rating ?? 0,
+                        totalRatings: item.total_ratings ?? 0,
+                    }));
+                    
+                    setData(transformed);
+                } else {
+                    console.error("Data is not an array:", responseData);
+                }
+            } catch (err) {
+                console.error("Fetch error:", err);
+            } finally {
+                setLoading(false);
             }
-            setData(data && data.map((item, index) => ({
-                i: index + 1,
-                name: item.user_id,
-                avgRating: item.average_rating,
-            })))
         }
         
-        fetchData();
+        if (token) {
+            fetchData();
+        }
     }, [token]);
 
   return (
@@ -122,57 +102,70 @@ export default function LeaderboardPage() {
           </CardHeader>
 
           <CardContent className="space-y-3">
-            {data.map((user, index) => (
-              <div
-                key={user.id}
-                className="flex items-center justify-between rounded-xl bg-muted/60 px-4 py-3"
-                style={{
-                    backgroundColor: bgColor,
-                    borderColor: "rgba(0,0,0,0.08)",
-                  }}
-                >
-              >
-                {/* Left: rank + avatar + name */}
-                <div className="flex items-center gap-3">
-                  <span className="w-6 text-center text-sm font-semibold">
-                    #{index + 1}
-                  </span>
-
-                    <Avatar className="h-9 w-9 border border-white/40">
-                      <AvatarImage src="" alt={user.name} />
-                      <AvatarFallback className="bg-[#1A3D2F] text-white">
-                        {user.name
-                          .split(" ")
-                          .map((n) => n[0])
-                          .join("")
-                          .slice(0, 2)
-                          .toUpperCase()}
-                      </AvatarFallback>
-                    </Avatar>
-
-                    <div className="flex flex-col">
-                      <span className="text-sm font-medium leading-none text-[#1A3D2F]">
-                        {user.name}
+            {loading ? (
+              <div className="text-center py-8">
+                <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-[#1A3D2F] border-r-transparent"></div>
+                <p className="text-sm text-[#5F7467] mt-3">Loading leaderboard...</p>
+              </div>
+            ) : data.length === 0 ? (
+              <p className="text-center text-sm text-[#5F7467] py-4">
+                No leaderboard data available
+              </p>
+            ) : (
+              data.map((item, index) => {
+                const bgColor = rankColors[index + 1] || rankColors.default;
+                
+                return (
+                  <div
+                    key={item.id}
+                    className="flex items-center justify-between rounded-xl px-4 py-3"
+                    style={{
+                      backgroundColor: bgColor,
+                      borderColor: "rgba(0,0,0,0.08)",
+                    }}
+                  >
+                    {/* Left: rank + avatar + name */}
+                    <div className="flex items-center gap-3">
+                      <span className="w-6 text-center text-sm font-semibold">
+                        #{index + 1}
                       </span>
-                      <span className="text-xs text-[#1A3D2F]/70">
-                        {user.username}
+
+                      <Avatar className="h-9 w-9 border border-white/40">
+                        <AvatarImage src="" alt={item.name} />
+                        <AvatarFallback className="bg-[#1A3D2F] text-white">
+                          {item.name
+                            .split(" ")
+                            .map((n) => n[0])
+                            .join("")
+                            .slice(0, 2)
+                            .toUpperCase()}
+                        </AvatarFallback>
+                      </Avatar>
+
+                      <div className="flex flex-col">
+                        <span className="text-sm font-medium leading-none text-[#1A3D2F]">
+                          {item.name}
+                        </span>
+                        <span className="text-xs text-[#1A3D2F]/70">
+                          {item.username}
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Right: Rating */}
+                    <div className="flex flex-col items-end">
+                      <span className="text-sm font-semibold text-[#1A3D2F]">
+                        {item.avgRating.toFixed(1)}
+                        <span className="text-xs text-[#1A3D2F]/70"> / 5</span>
+                      </span>
+                      <span className="text-[11px] text-[#1A3D2F]/70">
+                        {item.totalRatings} ratings
                       </span>
                     </div>
                   </div>
-
-                  {/* Right: Rating */}
-                  <div className="flex flex-col items-end">
-                    <span className="text-sm font-semibold text-[#1A3D2F]">
-                      {user.avgRating.toFixed(1)}
-                      <span className="text-xs text-[#1A3D2F]/70"> / 5</span>
-                    </span>
-                    <span className="text-[11px] text-[#1A3D2F]/70">
-                      {user.totalRatings} ratings
-                    </span>
-                  </div>
-                </div>
-              );
-            })}
+                );
+              })
+            )}
           </CardContent>
         </Card>
       </main>

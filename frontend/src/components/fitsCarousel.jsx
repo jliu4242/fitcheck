@@ -1,32 +1,75 @@
 "use client";
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import {
   Carousel,
   CarouselContent,
   CarouselItem,
 } from "@/components/ui/carousel";
+import { useAuth } from "@/context/authContext";
 
 const fallbackImage = "/fits/guy.jpg";
 
 export default function FitsCarousel({
-  items = [],
   onSlideChange = () => {},
 }) {
-  const [api, setApi] = React.useState(null);
+  const [api, setApi] = useState(null);
+  const [fits, setFits] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const { token } = useAuth();
 
-  React.useEffect(() => {
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        setLoading(true);
+        const res = await fetch("http://localhost:8000/api/posts/get-recent", {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+          },
+        });
+
+        if (!res.ok) {
+          throw new Error('Failed to fetch posts');
+        }
+
+        const data = await res.json();
+        console.log("Raw data:", data);
+        console.log("Is array?", Array.isArray(data));
+
+        if (Array.isArray(data)) {
+          setFits(data.map((item, index) => ({
+            id: item.id || index + 1,
+            image: item.image_url,
+            name: item.caption || `Outfit ${index + 1}`,
+          })));
+        } else {
+          console.error("Data is not an array:", data);
+          setFits([]);
+        }
+      } catch (err) {
+        console.error("Fetch error:", err);
+        setFits([]);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    if (token) {
+      fetchData();
+    }
+  }, [token]);
+
+  useEffect(() => {
     if (!api) return;
 
     const handleSelect = () => {
-      // selectedScrollSnap() returns the current slide index (0-based)
       const idx = api.selectedScrollSnap?.();
       if (typeof idx === "number") {
         onSlideChange(idx);
       }
     };
 
-    // run once when api is ready
     handleSelect();
 
     api.on("select", handleSelect);
@@ -38,7 +81,15 @@ export default function FitsCarousel({
     };
   }, [api, onSlideChange]);
 
-  if (!items || items.length === 0) {
+  if (loading) {
+    return (
+      <div className="w-full rounded-3xl border-[3px] border-[#1A3D2F] bg-[#E7EEE3] flex items-center justify-center aspect-[3/4]">
+        <span className="text-sm text-gray-600">Loading outfits...</span>
+      </div>
+    );
+  }
+
+  if (!fits || fits.length === 0) {
     return (
       <div className="w-full rounded-3xl border-[3px] border-[#1A3D2F] bg-[#E7EEE3] flex items-center justify-center aspect-[3/4]">
         <span className="text-sm text-gray-600">No outfits yet</span>
@@ -53,8 +104,8 @@ export default function FitsCarousel({
       className="w-full"
     >
       <CarouselContent>
-        {items.map((item, i) => {
-          const imageSrc = item.image || item.avatar || fallbackImage;
+        {fits.map((item, i) => {
+          const imageSrc = item.image || fallbackImage;
 
           return (
             <CarouselItem key={item.id ?? i}>
@@ -63,7 +114,7 @@ export default function FitsCarousel({
                   <img
                     src={imageSrc}
                     alt={item.name || "Outfit"}
-                    className="w-full h-full object-fill"
+                    className="w-full h-full object-cover"
                   />
                 </div>
               </div>
