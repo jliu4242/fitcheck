@@ -1,59 +1,68 @@
-import { react, useState } from 'react';
-import { Card, CardContent } from "@/components/ui/card";
-import Image from "next/image";
-import { Carousel, CarouselContent, CarouselItem } from '@/components/ui/carousel';
+"use client";
 
-import CommentBar from "@/components/ui/commentBar";
+import React, { useRef, useState } from "react";
 
-const initialFits = [
-    {
-        id: 1,
-        image: '/fits/guy.jpg',
-        alt: 'buff guy in white tanktop',
-    },
-    {
-        id: 2,
-        image: '/fits/basicgirl.jpg',
-        alt: 'npc girl',
-    },
-    {
-        id: 3,
-        image: '/fits/man.jpg',
-        alt: 'npc man',
-    },
-]
+export default function FitsSlider({ items = [], onSlideChange }) {
+  const [index, setIndex] = useState(0);
+  const touchStartX = useRef(null);
 
+  const total = items.length || 1;
 
-export default function fitsSlider() {
-    const [fits, setFits] = useState(initialFits);
+  const goTo = (newIndex) => {
+    const safeIndex = ((newIndex % total) + total) % total; // wrap around
+    setIndex(safeIndex);
+    if (onSlideChange) onSlideChange(safeIndex);
+  };
 
-    const renderEvent = (fit) => {
-        return (
-            <Card className="">
-                <CardContent className="p-0 flex flex-col space-y-4">
-                    <div className="relative w-full h-[55dvh] overflow-hidden rounded-3xl">
-                        <Image
-                            src={fit.image}
-                            alt={fit.alt}
-                            fill
-                            className="object-cover p-1.5"
-                        />
-                    </div>
-                    <div className='pl-5 pr-5'>
-                        <CommentBar/>
-                    </div>
-                </CardContent>
-            </Card>
-        )
+  const handleTouchStart = (e) => {
+    touchStartX.current = e.touches[0].clientX;
+  };
+
+  const handleTouchEnd = (e) => {
+    if (touchStartX.current == null) return;
+    const deltaX = e.changedTouches[0].clientX - touchStartX.current;
+
+    if (Math.abs(deltaX) > 40) {
+      if (deltaX > 0) {
+        goTo(index - 1); // swipe right -> previous
+      } else {
+        goTo(index + 1); // swipe left -> next
+      }
     }
 
-    return (
-        <Carousel>
-            <CarouselContent>
-                {fits.map((fit) => (
-                    <CarouselItem key={fit.id}>{renderEvent(fit)}</CarouselItem>
-                ))}
-            </CarouselContent>
-        </Carousel>
-    )
+    touchStartX.current = null;
+  };
+
+  const currentItem = items[index] ?? {};
+  const imageSrc = currentItem.image || currentItem.avatar || "/fits/guy.jpg";
+
+  return (
+    <div
+      className="w-full relative rounded-3xl border-[3px] border-[#1A3D2F] overflow-hidden bg-[#E7EEE3]"
+      onTouchStart={handleTouchStart}
+      onTouchEnd={handleTouchEnd}
+    >
+      {/* Outfit image */}
+      <div className="aspect-[3/4] w-full">
+        <img
+          src={imageSrc}
+          alt={currentItem.name || "Outfit"}
+          className="w-full h-full object-fits"
+        />
+      </div>
+
+      {/* Dots indicator */}
+      <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-1.5">
+        {items.map((_, i) => (
+          <button
+            key={i}
+            onClick={() => goTo(i)}
+            className={`h-1.5 rounded-full transition-all ${
+              i === index ? "w-4 bg-white" : "w-1.5 bg-white/60"
+            }`}
+          />
+        ))}
+      </div>
+    </div>
+  );
 }
