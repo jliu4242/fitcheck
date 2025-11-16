@@ -1,8 +1,9 @@
 "use client";
 
 import React from "react";
-import BottomNav from "@/components/ui/BottomNav";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
+import BottomNav from "@/components/ui/BottomNav";
 
 import {
   Card,
@@ -36,35 +37,42 @@ const MOCK_POSTS = [
 ];
 
 export default function UserPage() {
+  const router = useRouter();
+
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
       {/* Main content */}
-      <main className="flex-1 flex flex-col gap-4 px-4 pt-13 pb-24 max-w-md mx-auto w-full">
+      <main className="flex-1 flex flex-col gap-4 px-4 pt-12 pb-24 max-w-md mx-auto w-full">
         {/* User header (same style idea as leaderboard: title + subtitle) */}
         <Card>
-        <CardHeader className="flex flex-row items-center justify-between">
+          <CardHeader className="flex flex-row items-center justify-between">
             {/* LEFT: Avatar + name */}
             <div className="flex items-center gap-4">
-            <Avatar className="h-12 w-12">
+              <Avatar className="h-12 w-12">
                 <AvatarImage src="" alt={MOCK_USER.name} />
                 <AvatarFallback>
-                {MOCK_USER.name.charAt(0)}
+                  {MOCK_USER.name.charAt(0)}
                 </AvatarFallback>
-            </Avatar>
+              </Avatar>
 
-            <div>
+              <div>
                 <CardTitle className="text-base">{MOCK_USER.name}</CardTitle>
-                <CardDescription className="text-sm">{MOCK_USER.username}</CardDescription>
-            </div>
+                <CardDescription className="text-sm">
+                  {MOCK_USER.username}
+                </CardDescription>
+              </div>
             </div>
 
             {/* RIGHT: Logout button */}
-            <Button variant="destructive" size="sm">
-            Logout
+            <Button
+              variant="destructive"
+              size="sm"
+              onClick={() => router.push("/auth")}
+            >
+              Logout
             </Button>
-        </CardHeader>
+          </CardHeader>
         </Card>
-
 
         {/* Friends section */}
         <Card>
