@@ -15,6 +15,7 @@ import {
   AvatarImage,
   AvatarFallback,
 } from "@/components/ui/avatar"
+import { useAuth } from "@/context/authContext";
 
 const leaderboardData = [
   {
@@ -55,6 +56,8 @@ const leaderboardData = [
 ]
 
 export default function LeaderboardPage() {
+    const { user, token } = useAuth();
+
   return (
     <div className="flex min-h-screen flex-col bg-background text-foreground">
       

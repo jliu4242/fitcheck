@@ -3,6 +3,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import BottomNav from "@/components/ui/BottomNav";
+import { useAuth } from '@/context/authContext';
 
 export default function CameraPage() {
   const videoRef = useRef(null);
@@ -11,8 +12,8 @@ export default function CameraPage() {
   const [caption, setCaption] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const { user, token } = useAuth();
 
-  // Start camera
   useEffect(() => {
     let stream = null;
 
@@ -80,6 +81,8 @@ export default function CameraPage() {
     setLoading(true);
     setError("");
 
+    console.log({token});
+
     try {
       // Convert canvas to blob
       const blob = await new Promise((resolve) => {
@@ -93,12 +96,10 @@ export default function CameraPage() {
       formData.append('caption', caption);
       formData.append('image', file);
       
-      const authToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0QGdtYWlsLmNvbSIsImV4cCI6MTc2Mzg4NDQ3M30.k1ZSxV3GyycmZ4mDCg-CzjpB3393Ul-e4SZM4KnGgAA";
-
       const res = await fetch('http://localhost:8000/api/posts/create', {
         method: "POST",
         headers: {
-          'Authorization': `Bearer ${authToken}`,
+          'Authorization': `Bearer ${token}`,
         },
         body: formData,
       });

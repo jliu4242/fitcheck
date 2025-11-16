@@ -1,5 +1,6 @@
 import "./globals.css";
 import ServiceWorkerRegister from "@/components/ServiceWorkerRegister";
+import { AuthProvider } from '@/context/authContext';
 
 export const metadata = {
   title: "Outfit Check",
@@ -14,8 +15,10 @@ export default function RootLayout({ children }) {
         <meta name="theme-color" content="#000000" />
       </head>
       <body>
-        <ServiceWorkerRegister />
-        {children}
+        <AuthProvider>
+            <ServiceWorkerRegister />
+            {children}
+        </AuthProvider>
       </body>
     </html>
   );

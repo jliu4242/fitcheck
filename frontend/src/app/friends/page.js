@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import BottomNav from "@/components/ui/BottomNav";
+import { useAuth } from "@/context/authContext";
 
 const ALL_USERS = [
   { id: 1, name: "Michael" },
@@ -19,6 +20,7 @@ export default function FriendsPage() {
   const [search, setSearch] = useState("");
   const [friends, setFriends] = useState([]);
   const [activeTab, setActiveTab] = useState("find"); // "find" | "list"
+  const { user, token } = useAuth();
 
   const nonFriends = useMemo(
     () =>
