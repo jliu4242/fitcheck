@@ -180,9 +180,6 @@ export default function LeaderboardPage() {
                         {item.avgRating.toFixed(1)}
                         <span className="text-xs text-[#1A3D2F]/70"> / 100</span>
                       </span>
-                      <span className="text-[11px] text-[#1A3D2F]/70">
-                        {item.totalRatings} ratings
-                      </span>
                     </div>
                   </div>
                 );
