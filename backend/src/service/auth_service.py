@@ -1,8 +1,8 @@
-from src.repository.user_repository import UserRepository
+from ..repository.user_repository import UserRepository
 from sqlalchemy.orm import Session
-from src.dto.auth_schemas import SignupRequest, SignUpResponse, LoginRequest, LoginResponse
-from src.models.users import User
-from src.service.jwt_service import JwtService
+from ..dto.auth_schemas import SignupRequest, SignUpResponse, LoginRequest, LoginResponse
+from ..models.users import User
+from .jwt_service import JwtService
 import bcrypt
 
 jwt_service = JwtService()

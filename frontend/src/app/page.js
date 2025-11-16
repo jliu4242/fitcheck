@@ -87,6 +87,7 @@ export default function HomePage() {
           Rate Your Friend&apos;s Outfit
         </h1>
 
+<<<<<<< HEAD
         {/* CAROUSEL + OVERLAYS */}
         <div className="relative mt-0 h-[490px]">
           {/* User info bubble (top-left) */}
@@ -120,6 +121,11 @@ export default function HomePage() {
           {/* Carousel stretched vertically */}
           <div className="absolute inset-0 pt-5 pb-2">
             <FitsCarousel items={FITS} onSlideChange={handleSlideChange} />
+=======
+          <div className="flex flex-col leading-tight">
+            <span className="text-sm font-semibold">You</span>
+            <span className="text-xs text-muted-foreground">3 hrs ago</span>
+>>>>>>> main
           </div>
         </div>
 
