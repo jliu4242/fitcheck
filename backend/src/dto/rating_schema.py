@@ -2,8 +2,7 @@ from uuid import UUID
 from pydantic import BaseModel
 
 class RatingData(BaseModel):
-    rater_id: UUID
-    post_id: UUID
+    post_id: str | UUID | None
     rating_value: float
 
 class RatingResponse(BaseModel):

@@ -1,45 +1,14 @@
 "use client";
 
-import React, { useCallback, useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { MessageCircle } from "lucide-react";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import FitsSlider from "@/components/fitsSlider";
 import FitsCarousel from "@/components/fitsCarousel";
 import BottomNav from "@/components/ui/BottomNav";
 import { Slider } from "@/components/ui/slider";
 import CommentBar from "@/components/ui/commentBar";
-
-const FITS = [
-  {
-    id: 1,
-    name: "Emily Chen",
-    username: "@emchen",
-    avatar: "/emily.jpg",
-    image: "/fits/basicgirl.jpg",
-    timeAgo: "5 min ago",
-    caption: "Cozy coffee shop vibes ☕✨",
-  },
-  {
-    id: 2,
-    name: "Rizky",
-    username: "@riz",
-    avatar: "/rizky.png",
-    image: "/fits/guy.jpg",
-    timeAgo: "30 min ago",
-    caption: "Trying something new today, thoughts?",
-  },
-  {
-    id: 3,
-    name: "Daniel Park",
-    username: "@dpark",
-    avatar: "/daniel.png",
-    image: "/fits/man.jpg",
-    timeAgo: "1 hr ago",
-    // no caption on purpose – should hide the caption section
-    caption: "",
-  },
-];
+import { useAuth } from "@/context/authContext";
 
 // demo starting comments
 const INITIAL_COMMENTS = {
@@ -52,13 +21,63 @@ const INITIAL_COMMENTS = {
 };
 
 export default function HomePage() {
+  const { token } = useAuth();
   const [rating, setRating] = useState(0);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isCommentsOpen, setIsCommentsOpen] = useState(false);
   const [commentsByFit, setCommentsByFit] = useState(INITIAL_COMMENTS);
+  const [fits, setFits] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  const currentFit = FITS[currentIndex] ?? FITS[0];
-  const currentComments = commentsByFit[currentFit.id] ?? [];
+  // Fetch fits data
+  useEffect(() => {
+    async function fetchFits() {
+      try {
+        setLoading(true);
+        const res = await fetch("http://localhost:8000/api/posts/get-recent", {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+          },
+        });
+
+        if (!res.ok) {
+          throw new Error('Failed to fetch posts');
+        }
+
+        const data = await res.json();
+        console.log("Raw fits data:", data);
+
+        if (Array.isArray(data)) {
+          const transformed = data.map((item) => ({
+            id: item.post_id, // ✅ Use actual post_id from database
+            image: item.image_url,
+            name: item.user_name || 'Unknown',
+            username: `@${item.user_name || 'unknown'}`,
+            avatar: item.user_avatar || '',
+            caption: item.caption || '',
+            timeAgo: item.created_at || 'Just now',
+          }));
+          
+          setFits(transformed);
+        } else {
+          setFits([]);
+        }
+      } catch (err) {
+        console.error("Fetch error:", err);
+        setFits([]);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    if (token) {
+      fetchFits();
+    }
+  }, [token]);
+
+  const currentFit = fits[currentIndex];
+  const currentComments = currentFit ? (commentsByFit[currentFit.id] ?? []) : [];
 
   const handleSlideChange = (idx) => {
     setCurrentIndex(idx);
@@ -67,7 +86,7 @@ export default function HomePage() {
 
   const handleAddComment = (text) => {
     const clean = text.trim();
-    if (!clean) return;
+    if (!clean || !currentFit) return;
 
     setCommentsByFit((prev) => {
       const existing = prev[currentFit.id] ?? [];
@@ -82,6 +101,61 @@ export default function HomePage() {
       };
     });
   };
+
+  async function saveRating(num) {
+    if (!currentFit) return;
+    
+    const post_id = currentFit.id;
+    console.log("Saving rating for post_id:", post_id);
+
+    const body = JSON.stringify({
+        post_id: post_id,
+        rating_value: Number(num),
+    });
+
+    console.log(body);
+    
+    
+    try {
+      const res = await fetch("http://localhost:8000/ratings/create-rating", {
+        method: 'POST',
+        headers: {
+            "Content-Type": "application/json",
+          'Authorization': `Bearer ${token}`,
+        },
+        body: body,
+      });
+
+      if (!res.ok) {
+        throw new Error('Failed to save rating');
+      }
+
+      const data = await res.json();
+      console.log('Rating saved:', data);
+      alert(`Rating ${num} saved!`);
+    } catch (err) {
+      console.error('Error saving rating:', err);
+      alert('Failed to save rating');
+    }
+  }
+
+  // Show loading state
+  if (loading) {
+    return (
+      <main className="min-h-screen bg-[#f0ddbb] flex items-center justify-center">
+        <p className="text-[#1A3D2F]">Loading fits...</p>
+      </main>
+    );
+  }
+
+  // Show empty state
+  if (!currentFit) {
+    return (
+      <main className="min-h-screen bg-[#f0ddbb] flex items-center justify-center">
+        <p className="text-[#1A3D2F]">No fits available</p>
+      </main>
+    );
+  }
 
   return (
     <main className="min-h-screen bg-[#f0ddbb] text-[#1A3D2F] flex flex-col">
@@ -123,21 +197,21 @@ export default function HomePage() {
 
           {/* Carousel stretched vertically */}
           <div className="absolute inset-0 pt-4 pb-0">
-            <FitsCarousel items={FITS} onSlideChange={handleSlideChange} />
+            <FitsCarousel items={fits} onSlideChange={handleSlideChange} />
           </div>
         </div>
         
-          {/* CAPTION SECTION (only if caption exists) */}
-          {currentFit.caption && currentFit.caption.trim() !== "" && (
-            <div className="px-3 py-2 rounded-2xl bg-white/80 border border-[#AFC7B6]/60 shadow-sm">
-              <p className="text-xs text-[#111827]">
-                <span className="font-semibold mr-1">
-                  {currentFit.username}
-                </span>
-                {currentFit.caption}
-              </p>
-            </div>
-          )}
+        {/* CAPTION SECTION (only if caption exists) */}
+        {currentFit.caption && currentFit.caption.trim() !== "" && (
+          <div className="px-3 py-2 rounded-2xl bg-white/80 border border-[#AFC7B6]/60 shadow-sm">
+            <p className="text-xs text-[#111827]">
+              <span className="font-semibold mr-1">
+                {currentFit.username}
+              </span>
+              {currentFit.caption}
+            </p>
+          </div>
+        )}
 
         {/* RATING SLIDER + CAPTION */}
         <div className="pt-0 px-5">
@@ -147,8 +221,9 @@ export default function HomePage() {
             step={1}
             resetKey={currentIndex}
             onLock={(num) => {
-              alert(num); // still shows 34, 57, etc
-              setRating(num);
+                const value = num[0]
+              saveRating(value);
+              setRating(value);
             }}
           />
           <p className="mt-2 text-xs text-[#5F7467] text-center">

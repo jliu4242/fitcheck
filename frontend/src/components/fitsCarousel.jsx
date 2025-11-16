@@ -39,7 +39,7 @@ export default function FitsCarousel({
 
         if (Array.isArray(data)) {
           setFits(data.map((item, index) => ({
-            id: item.id || index + 1,
+            id: item.post_id,
             image: item.image_url,
             name: item.caption || `Outfit ${index + 1}`,
           })));

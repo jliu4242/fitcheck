@@ -18,11 +18,13 @@ import {
 import { useAuth } from "@/context/authContext";
 
 const rankColors = {
-  1: "#D4AF37", // Gold
-  2: "#C0C0C0", // Silver
-  3: "#CD7F32", // Bronze
-  default: "#B4C8B1", // Soft Green for others
-};
+    1: "#D4AF37", // Gold
+    2: "#C0C0C0", // Silver
+    3: "#CD7F32", // Bronze
+    4: "#A9A9A9", // Dark Gray
+    5: "#B87333", // Copper
+    default: "#B4C8B1", // Soft Green for others
+  };
 
 export default function LeaderboardPage() {
     const { user, token } = useAuth();
@@ -52,13 +54,33 @@ export default function LeaderboardPage() {
                     // Take top 5
                     const topFive = responseData.slice(0, 5);
                     
-                    // Transform data
-                    const transformed = topFive.map((item, index) => ({
-                        id: index + 1,
-                        name: item.user_id || 'Unknown',
-                        username: `@${item.user_id || 'unknown'}`,
-                        avgRating: item.average_rating ?? 0,
-                        totalRatings: item.total_ratings ?? 0,
+                    // Transform data and fetch usernames
+                    const transformed = await Promise.all(topFive.map(async (item, index) => {
+                        let username = 'Unknown';
+                        
+                        try {
+                            const userRes = await fetch(`http://127.0.0.1:8000/api/users/${item.user_id}`, {
+                                method: 'GET',
+                                headers: {
+                                    'Authorization': `Bearer ${token}`,
+                                },
+                            });
+                            
+                            if (userRes.ok) {
+                                const userData = await userRes.json();
+                                username = userData.username || 'Unknown';
+                            }
+                        } catch (err) {
+                            console.error(`Error fetching user ${item.user_id}:`, err);
+                        }
+                        
+                        return {
+                            id: index + 1,
+                            name: username,
+                            username: `@${username.toLowerCase()}`,
+                            avgRating: item.average_rating ?? 0,
+                            totalRatings: item.total_ratings ?? 0,
+                        };
                     }));
                     
                     setData(transformed);
@@ -156,7 +178,7 @@ export default function LeaderboardPage() {
                     <div className="flex flex-col items-end">
                       <span className="text-sm font-semibold text-[#1A3D2F]">
                         {item.avgRating.toFixed(1)}
-                        <span className="text-xs text-[#1A3D2F]/70"> / 5</span>
+                        <span className="text-xs text-[#1A3D2F]/70"> / 100</span>
                       </span>
                       <span className="text-[11px] text-[#1A3D2F]/70">
                         {item.totalRatings} ratings
