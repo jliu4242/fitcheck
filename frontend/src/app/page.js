@@ -29,40 +29,84 @@ export default function HomePage() {
   const [fits, setFits] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // Fetch fits data
+  // Fetch fits data + resolve usernames from /api/users/{user_id}
   useEffect(() => {
+    if (!token) return;
+
     async function fetchFits() {
       try {
         setLoading(true);
+
+        // 1) fetch posts
         const res = await fetch("http://localhost:8000/api/posts/get-recent", {
-          method: 'POST',
+          method: "POST",
           headers: {
-            'Authorization': `Bearer ${token}`,
+            Authorization: `Bearer ${token}`,
           },
         });
 
         if (!res.ok) {
-          throw new Error('Failed to fetch posts');
+          throw new Error("Failed to fetch posts");
         }
 
-        const data = await res.json();
-        console.log("Raw fits data:", data);
+        const posts = await res.json();
+        console.log("Raw fits data:", posts);
 
-        if (Array.isArray(data)) {
-          const transformed = data.map((item) => ({
-            id: item.post_id, // ✅ Use actual post_id from database
-            image: item.image_url,
-            name: item.user_name || 'Unknown',
-            username: `@${item.user_name || 'unknown'}`,
-            avatar: item.user_avatar || '',
-            caption: item.caption || '',
-            timeAgo: item.created_at || 'Just now',
-          }));
-          
-          setFits(transformed);
-        } else {
+        if (!Array.isArray(posts)) {
           setFits([]);
+          return;
         }
+
+        // 2) collect unique user_ids
+        const userIds = Array.from(
+          new Set(posts.map((p) => p.user_id).filter(Boolean))
+        );
+
+        // 3) fetch usernames for each user_id
+        const userMap = {};
+
+        await Promise.all(
+          userIds.map(async (userId) => {
+            try {
+              const userRes = await fetch(
+                `http://localhost:8000/api/users/${userId}`,
+                {
+                  headers: {
+                    Authorization: `Bearer ${token}`,
+                  },
+                }
+              );
+
+              if (!userRes.ok) {
+                throw new Error("Failed to fetch user");
+              }
+
+              const userData = await userRes.json();
+              // backend returns { username: "..." }
+              userMap[userId] = userData?.username || "Unknown";
+            } catch (e) {
+              console.error(`Error fetching user ${userId}:`, e);
+              userMap[userId] = "Unknown";
+            }
+          })
+        );
+
+        // 4) transform posts using userMap
+        const transformed = posts.map((item) => {
+          const username = userMap[item.user_id] || "Unknown";
+
+          return {
+            id: item.post_id, // ✅ actual post_id from db
+            image: item.image_url,
+            name: username,
+            username: `@${username || "unknown"}`,
+            avatar: item.user_avatar || "",
+            caption: item.caption || "",
+            timeAgo: item.created_at || "Just now",
+          };
+        });
+
+        setFits(transformed);
       } catch (err) {
         console.error("Fetch error:", err);
         setFits([]);
@@ -71,13 +115,11 @@ export default function HomePage() {
       }
     }
 
-    if (token) {
-      fetchFits();
-    }
+    fetchFits();
   }, [token]);
 
   const currentFit = fits[currentIndex];
-  const currentComments = currentFit ? (commentsByFit[currentFit.id] ?? []) : [];
+  const currentComments = currentFit ? commentsByFit[currentFit.id] ?? [] : [];
 
   const handleSlideChange = (idx) => {
     setCurrentIndex(idx);
@@ -104,38 +146,38 @@ export default function HomePage() {
 
   async function saveRating(num) {
     if (!currentFit) return;
-    
+
     const post_id = currentFit.id;
     console.log("Saving rating for post_id:", post_id);
 
     const body = JSON.stringify({
-        post_id: post_id,
-        rating_value: Number(num),
+      post_id: post_id,
+      rating_value: Number(num),
     });
 
     console.log(body);
-    
-    
+
     try {
-      const res = await fetch("http://localhost:8000/ratings/create-rating", {
-        method: 'POST',
-        headers: {
+      const res = await fetch(
+        "http://localhost:8000/ratings/create-rating",
+        {
+          method: "POST",
+          headers: {
             "Content-Type": "application/json",
-          'Authorization': `Bearer ${token}`,
-        },
-        body: body,
-      });
+            Authorization: `Bearer ${token}`,
+          },
+          body: body,
+        }
+      );
 
       if (!res.ok) {
-        throw new Error('Failed to save rating');
+        throw new Error("Failed to save rating");
       }
 
       const data = await res.json();
-      console.log('Rating saved:', data);
-      alert(`Rating ${num} saved!`);
+      console.log("Rating saved:", data);
     } catch (err) {
-      console.error('Error saving rating:', err);
-      alert('Failed to save rating');
+      console.error("Error saving rating:", err);
     }
   }
 
@@ -200,7 +242,7 @@ export default function HomePage() {
             <FitsCarousel items={fits} onSlideChange={handleSlideChange} />
           </div>
         </div>
-        
+
         {/* CAPTION SECTION (only if caption exists) */}
         {currentFit.caption && currentFit.caption.trim() !== "" && (
           <div className="px-3 py-2 rounded-2xl bg-white/80 border border-[#AFC7B6]/60 shadow-sm">
@@ -221,22 +263,11 @@ export default function HomePage() {
             step={1}
             resetKey={currentIndex}
             onLock={(num) => {
-                const value = num[0]
+              const value = num[0];
               saveRating(value);
               setRating(value);
             }}
           />
-          <p className="mt-2 text-xs text-[#5F7467] text-center">
-            Rating for{" "}
-            <span className="font-semibold text-[#1A3D2F]">
-              {currentFit.name}
-            </span>
-            :{" "}
-            <span className="font-semibold text-[#1A3D2F]">
-              {rating}
-            </span>
-            /100
-          </p>
         </div>
       </div>
 
@@ -249,7 +280,10 @@ export default function HomePage() {
       {isCommentsOpen && (
         <div className="fixed inset-1 z-40 flex flex-col bg-black/40">
           {/* tap outside to close */}
-          <div className="flex-1" onClick={() => setIsCommentsOpen(false)} />
+          <div
+            className="flex-1"
+            onClick={() => setIsCommentsOpen(false)}
+          />
 
           {/* bottom sheet */}
           <div className="bg-[#F4F7F2] rounded-t-3xl p-4 pb-[calc(env(safe-area-inset-bottom)+25px)] max-h-[80vh] flex flex-col shadow-[0_-8px_24px_rgba(0,0,0,0.15)]">
@@ -266,8 +300,12 @@ export default function HomePage() {
                   </AvatarFallback>
                 </Avatar>
                 <div className="flex flex-col leading-tight">
-                  <span className="text-sm font-medium">{currentFit.name}</span>
-                  <span className="text-[11px] text-[#6B7280]">Comments</span>
+                  <span className="text-sm font-medium">
+                    {currentFit.name}
+                  </span>
+                  <span className="text-[11px] text-[#6B7280]">
+                    Comments
+                  </span>
                 </div>
               </div>
               <button
@@ -291,7 +329,9 @@ export default function HomePage() {
                     <span className="text-[11px] font-medium text-[#111827]">
                       {c.user}
                     </span>
-                    <span className="text-xs text-[#374151]">{c.text}</span>
+                    <span className="text-xs text-[#374151]">
+                      {c.text}
+                    </span>
                   </div>
                 ))
               )}

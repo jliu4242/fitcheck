@@ -36,7 +36,7 @@ export default function FriendsPage() {
             });
 
             if (!res.ok) {
-                throw new Error('Failed to fetch leaderboard');
+                throw new Error('Failed to fetch users');
             }
 
             const responseData = await res.json();
@@ -66,7 +66,7 @@ export default function FriendsPage() {
     if (token) {
         fetchData();
     }
-}, [token]);
+}, [token, search]);
 
   useEffect(() => {
         async function fetchData() {
@@ -112,11 +112,30 @@ export default function FriendsPage() {
         }
     }, [token]);
 
-  const handleAdd = (user) => {
-    if (!friends.some((f) => f.id === user.id)) {
-      setFriends((prev) => [...prev, user]);
-    }
-  };
+    const handleAdd = async (user) => {
+        try {
+          const res = await fetch(`http://localhost:8000/api/friend/add-friend/${user.name}`, {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${token}`,
+            },
+          });
+    
+          if (!res.ok) {
+            throw new Error('Failed to add friend');
+          }
+    
+          // Remove the user from nonFriends list
+          setNonFriends((prev) => prev.filter((f) => f.id !== user.id));
+          
+          // Add to friends list
+          if (!friends.some((f) => f.id === user.id)) {
+            setFriends((prev) => [...prev, user]);
+          }
+        } catch (err) {
+          console.error("Error adding friend:", err);
+        }
+      };
 
   return (
     <div className="min-h-screen bg-[#f0ddbb] flex flex-col text-[#1A3D2F]">
