@@ -2,7 +2,7 @@ from sqlalchemy import Column, ForeignKey, UniqueConstraint, Index
 from sqlalchemy.dialects.postgresql import UUID
 import uuid
 
-from base import Base
+from .base import Base
 
 
 class Friend(Base):
