@@ -38,7 +38,7 @@ export default function HomePage() {
       </div>
 
       {/* ==== BOTTOM NAVIGATION (fixed) ==== */}
-      <div className="fixed inset-x-0 bottom-0 px-4 pb-[calc(env(safe-area-inset-bottom)+12px)]">
+      <div className="fixed inset-x-0 bottom-2 px-4 pb-[calc(env(safe-area-inset-bottom)+12px)]">
         <BottomNav activeTab="home" />
       </div>
     </main>

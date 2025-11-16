@@ -128,7 +128,7 @@ export default function LeaderboardPage() {
       </main>
 
       {/* ==== BOTTOM NAVIGATION (fixed) ==== */}
-        <div className="fixed inset-x-0 bottom-0 px-4 pb-[calc(env(safe-area-inset-bottom)+12px)]">
+        <div className="fixed inset-x-0 bottom-2 px-4 pb-[calc(env(safe-area-inset-bottom)+12px)]">
             <BottomNav activeTab="leaderboard" />
         </div>
     </div>

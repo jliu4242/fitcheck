@@ -3,6 +3,7 @@
 import React from "react";
 import Link from "next/link";
 import { Home, Users, Shirt, List, User } from "lucide-react";
+import { motion } from "framer-motion";
 
 export default function BottomNav({ activeTab = "outfit" }) {
   return (
@@ -23,14 +24,18 @@ function NavIcon({ href, icon, label, active }) {
       aria-label={label}
       className="flex items-center justify-center shrink-0"
     >
-      <div
-        className={`h-11 w-11 rounded-full flex items-center justify-center transition-all ${
-          active ? "bg-[#F4FFE3]" : "bg-transparent"
-        }`}
-      >
-        <button className="h-9 w-9 rounded-full flex items-center justify-center">
+      <div className="relative h-11 w-11 flex items-center justify-center">
+        {active && (
+          <motion.span
+            layoutId="nav-active-circle"
+            className="absolute inset-0 rounded-full bg-[#F4FFE3]"
+            transition={{ type: "spring", stiffness: 400, damping: 30 }}
+          />
+        )}
+
+        <div className="relative z-10 h-9 w-9 rounded-full flex items-center justify-center">
           {icon}
-        </button>
+        </div>
       </div>
     </Link>
   );
