@@ -17,6 +17,7 @@ import { Input } from "@/components/ui/input"
 
 export function LoginForm({
   className,
+  switchToSignup, // <-- ADD THIS
   ...props
 }) {
   return (
@@ -28,31 +29,51 @@ export function LoginForm({
             Enter your email below to login to your account
           </CardDescription>
         </CardHeader>
+
         <CardContent>
           <form>
             <FieldGroup>
               <Field>
                 <FieldLabel htmlFor="email">Email</FieldLabel>
-                <Input id="email" type="email" placeholder="m@example.com" required />
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="m@example.com"
+                  required
+                />
               </Field>
+
               <Field>
                 <div className="flex items-center">
                   <FieldLabel htmlFor="password">Password</FieldLabel>
-                  <a
-                    href="#"
-                    className="ml-auto inline-block text-sm underline-offset-4 hover:underline">
+                  <button
+                    type="button"
+                    className="ml-auto inline-block text-sm underline-offset-4 hover:underline"
+                  >
                     Forgot your password?
-                  </a>
+                  </button>
                 </div>
                 <Input id="password" type="password" required />
               </Field>
+
               <Field>
-                <Button type="submit">Login</Button>
-                <Button variant="outline" type="button">
+                <Button type="submit" className="w-full">
+                  Login
+                </Button>
+
+                <Button variant="outline" type="button" className="w-full mt-2">
                   Login with Google
                 </Button>
-                <FieldDescription className="text-center">
-                  Don&apos;t have an account? <a href="#">Sign up</a>
+
+                <FieldDescription className="text-center pt-2">
+                  Don&apos;t have an account?{" "}
+                  <button
+                    type="button"
+                    className="text-primary underline-offset-4 hover:underline"
+                    onClick={switchToSignup}   // <-- FIXED
+                  >
+                    Sign up
+                  </button>
                 </FieldDescription>
               </Field>
             </FieldGroup>
@@ -60,5 +81,5 @@ export function LoginForm({
         </CardContent>
       </Card>
     </div>
-  );
+  )
 }
