@@ -7,8 +7,9 @@ import BottomNav from "@/components/ui/BottomNav";
 export default function CameraPage() {
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
-
   const [hasPhoto, setHasPhoto] = useState(false);
+  const [caption, setCaption] = useState("");
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
   // Start camera
@@ -42,7 +43,7 @@ export default function CameraPage() {
   const takePhoto = () => {
     const video = videoRef.current;
     const canvas = canvasRef.current;
-    if (!video || !canvas) return;
+    if (!canvas || !video) return;
 
     const width = video.videoWidth || 640;
     const height = video.videoHeight || 480;
@@ -55,13 +56,56 @@ export default function CameraPage() {
     setHasPhoto(true);
   };
 
-  const retake = () => setHasPhoto(false);
+  const retake = () => {
+    setHasPhoto(false);
+    setCaption("");
+  };
 
-  const postPhoto = () => {
-    const canvas = canvasRef.current;
-    const data = canvas.toDataURL("image/jpeg");
-    console.log("Uploaded:", data);
-    alert("Photo posted! (Check console)");
+  const postPhoto = async () => {
+    if (!canvasRef.current) return;
+
+    setLoading(true);
+    setError("");
+
+    try {
+      // Convert canvas to blob
+      const blob = await new Promise((resolve) => {
+        canvasRef.current.toBlob(resolve, "image/jpeg", 0.95);
+      });
+
+      // Create a File object from the blob
+      const file = new File([blob], "photo.jpg", { type: "image/jpeg" });
+
+      const formData = new FormData();
+      formData.append('caption', caption);
+      formData.append('image', file);
+
+      const authToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0QGdtYWlsLmNvbSIsImV4cCI6MTc2Mzg4NDQ3M30.k1ZSxV3GyycmZ4mDCg-CzjpB3393Ul-e4SZM4KnGgAA";
+
+      const res = await fetch('http://localhost:8000/api/posts/create', {
+        method: "POST",
+        headers: {
+          'Authorization': `Bearer ${authToken}`,
+        },
+        body: formData,
+      });
+
+      if (!res.ok) {
+        throw new Error('Failed to create post');
+      }
+
+      const data = await res.json();
+      console.log("Post created:", data);
+      alert("Photo posted successfully!");
+      
+      // Reset
+      retake();
+    } catch (err) {
+      console.error("Upload error:", err);
+      setError(err.message || "Failed to upload photo");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -82,8 +126,8 @@ export default function CameraPage() {
               <video
                 ref={videoRef}
                 className="w-full h-full object-cover"
-                playsInline
                 autoPlay
+                playsInline
                 muted
               />
             ) : (
@@ -95,6 +139,19 @@ export default function CameraPage() {
             <p className="text-red-500 text-xs mt-2 text-center">{error}</p>
           )}
         </div>
+
+        {/* Caption Input */}
+        {hasPhoto && (
+          <div className="w-full">
+            <input
+              type="text"
+              placeholder="Add a caption (optional)..."
+              value={caption}
+              onChange={(e) => setCaption(e.target.value)}
+              className="w-full px-4 py-2 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+        )}
 
         {/* Buttons */}
         <div className="flex justify-center gap-3 mt-2">
@@ -111,6 +168,7 @@ export default function CameraPage() {
                 variant="outline"
                 className="rounded-full px-6 text-sm font-semibold"
                 onClick={retake}
+                disabled={loading}
               >
                 Retake
               </Button>
@@ -118,20 +176,21 @@ export default function CameraPage() {
               <Button
                 className="rounded-full px-6 text-sm font-semibold"
                 onClick={postPhoto}
+                disabled={loading}
               >
-                Post
+                {loading ? "Posting..." : "Post"}
               </Button>
             </>
           )}
         </div>
       </main>
 
-      {/* ⭐ Bottom Navigation (fixed) */}
+      {/* Bottom Navigation (fixed) */}
       <div className="fixed inset-x-0 bottom-2 px-4 pb-[calc(env(safe-area-inset-bottom)+12px)]">
         <BottomNav activeTab="outfit" />
       </div>
 
-      {/* Hidden canvas */}
+      {/* Hidden canvas for capture */}
       <canvas ref={canvasRef} className="hidden" />
     </div>
   );
