@@ -18,3 +18,6 @@ class UserRepository:
         db.add(user)
         db.commit()
         db.refresh(user)
+
+    def find_by_id(self, db: Session, user_id) -> Optional[User]:
+        return db.query(User).filter(User.user_id == user_id).first()
