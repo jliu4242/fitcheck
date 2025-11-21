@@ -1,7 +1,7 @@
 {
-  "name": "Outfy",
-  "short_name": "Outfy",
-  "start_url": "/",
+  "name": "FitCheck",
+  "short_name": "FitChek",
+  "start_url": "/auth",
   "display": "standalone",
   "background_color": "#f3f3f3",
   "theme_color": "#000000",

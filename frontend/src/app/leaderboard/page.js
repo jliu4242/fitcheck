@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react"
+import React, { useEffect, useState, useMemo } from "react"
 import BottomNav from "@/components/ui/BottomNav";
 
 import {
@@ -35,7 +35,7 @@ export default function LeaderboardPage() {
         async function fetchData() {
             try {
                 setLoading(true);
-                const res = await fetch("http://localhost:8000/leaderboard/", {
+                const res = await fetch("http://3.98.128.26/leaderboard/", {
                     method: 'GET',
                     headers: {
                         'Authorization': `Bearer ${token}`,
@@ -59,7 +59,7 @@ export default function LeaderboardPage() {
                         let username = 'Unknown';
                         
                         try {
-                            const userRes = await fetch(`http://127.0.0.1:8000/api/users/${item.user_id}`, {
+                            const userRes = await fetch(`http://3.98.128.26/api/users/${item.user_id}`, {
                                 method: 'GET',
                                 headers: {
                                     'Authorization': `Bearer ${token}`,

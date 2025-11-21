@@ -28,7 +28,7 @@ export default function FriendsPage() {
     async function fetchData() {
         try {
             setLoading(true);
-            const res = await fetch(`http://localhost:8000/api/users/search/${search}`, {
+            const res = await fetch(`http://3.98.128.26/api/users/search/${search}`, {
                 method: 'GET',
                 headers: {
                     'Authorization': `Bearer ${token}`,
@@ -72,7 +72,7 @@ export default function FriendsPage() {
         async function fetchData() {
             try {
                 setLoading(true);
-                const res = await fetch("http://localhost:8000/api/friend/get-all-friends", {
+                const res = await fetch("http://3.98.128.26/api/friend/get-all-friends", {
                     method: 'GET',
                     headers: {
                         'Authorization': `Bearer ${token}`,
@@ -114,7 +114,7 @@ export default function FriendsPage() {
 
     const handleAdd = async (user) => {
         try {
-          const res = await fetch(`http://localhost:8000/api/friend/add-friend/${user.name}`, {
+          const res = await fetch(`http://3.98.128.26/api/friend/add-friend/${user.name}`, {
             method: 'POST',
             headers: {
               'Authorization': `Bearer ${token}`,

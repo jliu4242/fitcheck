@@ -22,7 +22,7 @@ export default function FitsCarousel({
     async function fetchData() {
       try {
         setLoading(true);
-        const res = await fetch("http://localhost:8000/api/posts/get-recent", {
+        const res = await fetch("http://3.98.128.26/api/posts/get-recent", {
           method: 'POST',
           headers: {
             'Authorization': `Bearer ${token}`,
