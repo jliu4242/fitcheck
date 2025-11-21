@@ -21,7 +21,8 @@ class FriendRepository():
             db.commit()
 
     def find_all_friends(self, db: Session, user_id) -> list[Friend]:
-        return db.query(Friend).filter((Friend.user_id == user_id) | (Friend.friend_id == user_id)).all()
+        return db.query(Friend).filter((Friend.user_id == user_id) #| (Friend.friend_id == user_id)
+                                       ).all()
 
     def is_friended(self, db: Session, curr_user_id, friend_id) -> bool:
         friendship = db.query(Friend).filter(((Friend.user_id == curr_user_id) & (Friend.friend_id == friend_id) | 
